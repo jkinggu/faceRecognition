@@ -1,0 +1,11 @@
+package com.dx.util;
+public class BaseUtil {
+
+	//对象转化 ，如果为null， 置空
+	public String getStr(String str) {
+		if(str==null || str.equals("null") || str.equals("请选择")) {
+			str = "";
+		}
+		return str;
+	}
+}

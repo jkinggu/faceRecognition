@@ -1,0 +1,69 @@
+package com.dx.pojo;
+
+/**登陆用户，添加swing登陆界面，设置人脸识别基本参数*/
+public class Faceadmin  implements java.io.Serializable{
+	
+	private Integer fid ;
+	private String bmname ;
+	private String bmpass ;
+	private String remarks ;
+	private String curmana ;
+	private String curchangci ;
+	public Faceadmin() {}
+	public Faceadmin(Integer fid, String bmname, String bmpass, String remarks,
+			String curmana,String curchangci) {
+		this.fid = fid ;
+		this.bmname = bmname ;
+		this.bmpass = bmpass ;
+		this.remarks = remarks ;
+		this.curmana =curmana ;
+		this.curchangci = curchangci ;
+	}
+	public Integer getFid() {
+		return fid;
+	}
+	public void setFid(Integer fid) {
+		this.fid = fid;
+	}
+	public String getBmname() {
+		return bmname;
+	}
+	public void setBmname(String bmname) {
+		this.bmname = bmname;
+	}
+	public String getBmpass() {
+		return bmpass;
+	}
+	public void setBmpass(String bmpass) {
+		this.bmpass = bmpass;
+	}
+	public String getRemarks() {
+		return remarks;
+	}
+	public void setRemarks(String remarks) {
+		this.remarks = remarks;
+	}
+	public String getCurmana() {
+		return curmana;
+	}
+	public void setCurmana(String curmana) {
+		this.curmana = curmana;
+	}
+	public String getCurchangci() {
+		return curchangci;
+	}
+	public void setCurchangci(String curchangci) {
+		this.curchangci = curchangci;
+	}
+	@Override
+	public String toString() {
+		return "Faceadmin [fid=" + fid + ", bmname=" + bmname + ", bmpass=" + bmpass + ", remarks=" + remarks
+				+ ", curmana=" + curmana + ", curchangci=" + curchangci + "]";
+	}
+	
+	
+	
+	
+	
+
+}

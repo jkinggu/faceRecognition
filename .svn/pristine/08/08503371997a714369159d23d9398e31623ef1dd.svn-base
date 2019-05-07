@@ -1,0 +1,17 @@
+package com.dx.service;
+
+import java.util.List;
+
+import com.dx.inter.BelongforInterface;
+import com.dx.pojo.Belongfor;
+
+public class BelongforImpl implements BelongforInterface{
+
+	/**所有的单位列表*/
+	@Override
+	public List<Belongfor> getBelongforList() {
+		
+		return null;
+	}
+
+}

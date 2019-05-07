@@ -1,0 +1,101 @@
+package com.dx.query;
+
+/**
+ * @author fang
+ *
+ * @Date 2019年4月26日
+ *
+ *       项目名 FaceRecongnition
+ *
+ * @version 1.0
+ */
+
+public class QueryObject {
+	private int totalCount;
+	private int currentPage = 1;
+	private int totalPage;
+	private int pageSize = 25;
+	private int next;
+    private int previous;
+    private int start;
+    private int beginPage;
+    private int endPage;
+	public QueryObject(int totalCount,int currentPage) {
+		this.totalCount = totalCount;
+		this.totalPage = totalCount % pageSize == 0 ? totalCount / pageSize : (totalCount / pageSize) + 1;		
+		setCurrentPage(currentPage, totalPage, this.pageSize);	
+		this.next=currentPage<totalPage?currentPage+1:totalPage;
+		this.previous=currentPage>1?currentPage-1:1;
+		this.beginPage=1;
+		this.endPage=totalPage;
+	}
+	public int getTotalCount() {
+		return totalCount;
+	}
+
+	public int getCurrentPage() {
+		return currentPage;
+	}
+
+	public void setCurrentPage(int currentPage,int totalPages,int pageSize) {
+		//int totalPages=totalCount%pageSize==0?totalCount/pageSize:totalCount/pageSize+1;
+		if(currentPage>totalPages) {
+			this.currentPage=totalPages;
+		}else {
+			this.currentPage=currentPage;
+		}
+		if(currentPage<=0) {
+			this.currentPage=1;
+		}
+		
+		this.start=(this.currentPage-1)*pageSize;
+		
+	}
+
+	public int getTotalPage() {
+		return totalPage;
+	}
+
+
+	public int getPageSize() {
+		return pageSize;
+	}
+
+	public void setPageSize(int pageSize) {
+		this.pageSize = pageSize;
+	}
+
+	public int getNext() {
+		return next;
+	}
+
+	public void setNext(int next) {
+		this.next = next;
+	}
+
+	public int getPrevious() {
+		return previous;
+	}
+
+	
+	public void setPrevious(int previous) {
+		this.previous = previous;
+	}
+
+	public int getStart() {
+		return start;
+	}
+    public void setStart() {
+    	this.start=(currentPage-1)*pageSize;
+    }
+	public int getBeginPage() {
+		return beginPage;
+	}
+	public void setBeginPage(int beginPage) {
+		this.beginPage = beginPage;
+	}
+	public int getEndPage() {
+		return endPage;
+	}
+
+}

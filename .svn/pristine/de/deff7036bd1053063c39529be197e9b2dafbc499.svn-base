@@ -1,0 +1,220 @@
+package com.dx.service;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.List;
+
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileFilter;
+
+import org.dom4j.Document;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
+
+import com.dx.pojo.FaceLog;
+import com.fr.third.org.apache.poi.hssf.usermodel.HSSFCell;
+import com.fr.third.org.apache.poi.hssf.usermodel.HSSFRow;
+import com.fr.third.org.apache.poi.hssf.usermodel.HSSFSheet;
+import com.fr.third.org.apache.poi.hssf.usermodel.HSSFWorkbook;
+
+public class ExportFileService {  
+    private static final String SAVEPATH = "D:\\";   
+    private static final String BUTTONTEXT = "导出";    
+    private static final String  TITLE = "导出数据";    
+    public ExportFileService(){  
+          
+    }  
+    /** 
+     *  
+     * @param filters  可选择的导出类型 
+     * @return file[0] 文件全路径；file[1] 导出类型 
+     */  
+    public static String[] exportFile(List<FileFilter> filters){    
+        JFileChooser fileChooser = initEmportFile(filters);  
+        int result = fileChooser.showOpenDialog(null);  
+        String type = fileChooser.getFileFilter().getDescription();  
+        if (result == JFileChooser.APPROVE_OPTION) {  
+            File file = fileChooser.getSelectedFile();  
+            String fn = file.getPath();  
+            String[] fileAndType = new String[2];  
+            fileAndType[0]=fn;  
+            fileAndType[1]=type;  
+            return fileAndType;  
+        }  
+        return null;  
+    }  
+    /** 
+     * 文件对话框中判断是否覆盖已存在文件，加入带导入类型 
+     * @param filters 可选择的导入类型 
+     * @return 文件选择框 
+     */  
+    private static JFileChooser initEmportFile(List<FileFilter> filters) {  
+        JFileChooser fileChooser = new JFileChooser(SAVEPATH) {  
+            private static final long serialVersionUID = 1L;  
+  
+            public void approveSelection() {  
+                File file;  
+                String fileName = this.getSelectedFile().getAbsolutePath();  
+  
+                file = new File(fileName);  
+                if (file.exists()) {  
+                    int copy = JOptionPane.showConfirmDialog(null,  
+                            "是否要覆盖当前文件？", "保存", JOptionPane.YES_NO_OPTION,  
+                            JOptionPane.QUESTION_MESSAGE);  
+                    if (copy == JOptionPane.YES_OPTION) {  
+                        super.setSelectedFile(file);  
+                        super.approveSelection();  
+                    }  
+                } else  
+                    super.approveSelection();  
+            }  
+        };  
+        fileChooser.setAcceptAllFileFilterUsed(false);  
+        fileChooser.setApproveButtonText(BUTTONTEXT);  
+        fileChooser.setDialogTitle(TITLE);  
+        for(FileFilter one :filters){  
+            fileChooser.addChoosableFileFilter( one);  
+        }  
+        return fileChooser;  
+    }  
+    /** 
+     * 创建新的Excel 工作簿 
+     * @param filename 待导出文件名称的全路径，不带后缀 
+     * @param data 待导出数据，首个list<Object>是字段信息 
+     * @param sheetName 表单名称 
+     * @return true 导出成功；false 导出失败 
+     */  
+    @SuppressWarnings("deprecation")  
+    public static boolean createExcel(String filename, List<List<Object>> data,  
+            String sheetName) {   
+        HSSFWorkbook workbook = null;  
+        HSSFSheet sheet = null;  
+        HSSFRow[] rows = null;  
+        HSSFCell[][] cells = null;  
+        workbook = new HSSFWorkbook();  
+        if (sheetName.trim().equals("")) {  
+            sheet = workbook.createSheet("表");  
+        } else {  
+            sheet = workbook.createSheet(sheetName);  
+        }  
+        try {  
+            int row = 0;  
+            int col = 0;  
+            if (data.size() > 0) {  
+                row = data.size();  
+                col = data.get(0).size();  
+            }  
+            rows = new HSSFRow[row];  
+            cells = new HSSFCell[row][col];  
+            for (int i = 0; i < data.size(); i++) {  
+                rows[i] = sheet.createRow((short) i);  
+                for (int j = 0; j < data.get(i).size(); j++) {  
+                    cells[i][j] = rows[i].createCell((short) j);  
+                    cells[i][j].setCellType(HSSFCell.CELL_TYPE_STRING);  
+                    if (data.get(i).get(j) != null  
+                            && !data.get(i).get(j).toString().trim().equals("")) {  
+                        cells[i][j].setCellValue(data.get(i).get(j).toString()  
+                                .trim());  
+                    } else {  
+                        cells[i][j].setCellValue("");  
+                    }  
+                }  
+            }  
+            FileOutputStream fOut = new FileOutputStream(filename);  
+            // 把相应的Excel 工作簿存盘  
+            workbook.write(fOut);  
+            fOut.flush();  
+            // 操作结束，关闭文件  
+            fOut.close();  
+            return true;  
+        } catch (Exception e) {  
+            return false;  
+        }  
+    }  
+    /** 
+     * 生成XML文件 
+     * @param filename 待导出文件名称的全路径，不带后缀 
+     * @param data 待导出数据,首个list<Object>是字段信息 
+     * @return true 导出成功；false 导出失败 
+     */  
+    public static boolean createXML(String filename, List list) {  
+    	try {  
+    		Document doc = DocumentHelper.createDocument();  
+    		Element root = doc.addElement("allinfo");  
+    		FaceLog logs = null ;
+    		for(int i=0; i<list.size();i++) {
+    			logs = (FaceLog) list.get(i);
+    			Element row = root.addElement("FaceLog");
+    			//root.addAttribute("name", "facelog");
+    			
+    			Element id = row.addElement("id"); 
+    			id.setText(logs.getId()+"");
+    			id.addAttribute("name", "id");  
+    			
+    			Element sfz = row.addElement("sfz"); 
+    			sfz.setText(logs.getSfz()+"");
+    			sfz.addAttribute("name", "sfz"); 
+    			
+    			Element xingming = row.addElement("xingming"); 
+    			xingming.setText(logs.getXingming()+"");
+    			xingming.addAttribute("name", "xingming"); 
+    			
+    			Element xingbie = row.addElement("xingbie"); 
+    			xingbie.setText(logs.getXingbie()+"");
+    			xingbie.addAttribute("name", "xingbie"); 
+    			
+    			Element shibieleixing = row.addElement("shibieleixing"); 
+    			shibieleixing.setText(logs.getShibieleixing()+"");
+    			shibieleixing.addAttribute("name", "shibieleixing"); 
+    			
+    			Element shibieleixingint = row.addElement("shibieleixingint"); 
+    			shibieleixingint.setText(logs.getShibieleixingint()+"");
+    			shibieleixingint.addAttribute("name", "shibieleixingint"); 
+    			
+    			Element shijian = row.addElement("shijian"); 
+    			shijian.setText(logs.getShijian()+"");
+    			shijian.addAttribute("name", "shijian"); 
+    			
+    			Element renlianphoto = row.addElement("renlianphoto"); 
+    			renlianphoto.setText(logs.getRenlianphoto()+"");
+    			renlianphoto.addAttribute("name", "renlianphoto"); 
+    			
+    			Element remarks = row.addElement("remarks"); 
+    			remarks.setText(logs.getRemarks()+"");
+    			remarks.addAttribute("name", "remarks"); 
+    			
+    			Element sfzphoto = row.addElement("sfzphoto"); 
+    			sfzphoto.setText(logs.getSfzphoto()+"");
+    			sfzphoto.addAttribute("name", "sfzphoto");
+    			
+    			Element changci = row.addElement("changci"); 
+    			changci.setText(logs.getChangci()+"");
+    			changci.addAttribute("name", "changci");
+    			
+    			Element denglumana = row.addElement("denglumana"); 
+    			denglumana.setText(logs.getDenglumana()+"");
+    			denglumana.addAttribute("name", "denglumana");
+    			
+    			Element renzcount = row.addElement("renzcount"); 
+    			renzcount.setText(logs.getRenzcount()+"");
+    			renzcount.addAttribute("name", "renzcount");
+    			
+    		}
+            FileOutputStream fOut = new FileOutputStream(filename);  
+            OutputFormat format = new OutputFormat("", true);  
+            format.setEncoding("utf-8");  
+            // 可以把System.out改为你要的流。  
+            XMLWriter xmlWriter = new XMLWriter(fOut, format);  
+            xmlWriter.write(doc);  
+            xmlWriter.close();  
+            return true;  
+        } catch (IOException e) {  
+            e.printStackTrace();  
+        }  
+        return false;  
+    }  
+}

@@ -1,0 +1,4 @@
+driverClassName=com.mysql.jdbc.Driver
+url=jdbc:mysql://127.0.0.1:3306/facerenzheng?characterEncoding=utf8&rewriteBatchedStatements=true
+username=root
+password=123
