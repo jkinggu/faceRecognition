@@ -16,6 +16,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import org.opencv.core.Mat;
+
 import com.dx.inter.ParamSetupInterface;
 import com.dx.login.Login;
 import com.dx.service.ParamSetupImpl;
@@ -188,6 +190,8 @@ public class FaceMainFrame extends JFrame {
 					Thread mainThread = facepanel.getPanel1().getMainThread() ;
 					facepanel.getPanel1().getCamera().release();
 					facepanel.getPerson().closePerson();
+					facepanel.getPanel1().setMat(new Mat());
+					facepanel.getPanel1().setImage();
 					mainThread.interrupt();//摄像头线程中止
 				}
 			}

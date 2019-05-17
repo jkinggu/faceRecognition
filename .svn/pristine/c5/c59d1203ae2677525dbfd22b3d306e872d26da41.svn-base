@@ -36,20 +36,17 @@ import com.dx.service.FaceadminImpl;
 import com.dx.service.ParamSetupImpl;
 import com.dx.service.ZkzInterImpl;
 import com.dx.util.AFRTest;
-import com.dx.util.CameraUtil;
 import com.dx.util.FileUtil;
 
-import lombok.Getter;
-import lombok.Setter;
 
 
-@Getter @Setter
-public class CameraCore extends JPanel {
+public class CameraCapture extends JPanel {
 	
 	static{System.loadLibrary(Core.NATIVE_LIBRARY_NAME);}
 	static JLabel label;
 	static boolean flag=false;
 	//使用opencv，打开电脑摄像头发现人头拍照并保存
+	
 	private static final long serialVersionUID = 1L;
 	private static  BufferedImage mImg;  
 	private Thread mainThread = null;
@@ -65,13 +62,39 @@ public class CameraCore extends JPanel {
 	private CascadeClassifier faceDetector = new CascadeClassifier("D:\\faceimages\\opencv\\sources\\data\\haarcascades_cuda/haarcascade_frontalface_alt_tree.xml");//_tree
 	static PersonCard card = null ;
 	private boolean types = false ;
-	public CameraCore() {
+	public CameraCapture() {
 		label=new JLabel("");
 		label.setBounds(50, 50, 640, 480);
 		add(label);
 		//操作
-		//打开相机
-		camera=CameraUtil.getVideoCapture();		
+		camera=new VideoCapture();
+		camera.open(0);//0打开本地默认摄像头
+		//camera.release();关闭摄像头
+		if(!camera.isOpened()){
+			System.out.println("Camera Error");
+		} else{
+			/**
+			 * CV_CAP_PROP_FRAME_WIDTH 视频流帧的宽度/一帧图像的宽度
+CV_CAP_PROP_FRAME_HEIGHT 视频流帧的高./一帧图像的高度
+CV_CAP_PROP_FPS 帧率.
+CV_CAP_PROP_FRAME_COUNT 视频文件的帧数.
+CV_CAP_PROP_BRIGHTNESS 图像亮度 (只对摄像头).
+CV_CAP_PROP_CONTRAST 图像对比度 (只对摄像头).
+CV_CAP_PROP_SATURATION 图像饱和度 (只对摄像头).
+CV_CAP_PROP_HUE 色调 (只对摄像头).
+CV_CAP_PROP_GAIN 增益(只对摄像头).
+CV_CAP_PROP_EXPOSURE 曝光(只对摄像头).
+*/
+			camera.set(Videoio.CV_CAP_PROP_FRAME_WIDTH,800);
+			camera.set(Videoio.CV_CAP_PROP_FRAME_HEIGHT,600);
+			camera.set(Videoio.CV_CAP_PROP_FPS,60);//帧率
+			//camera.set(Videoio.CV_CAP_PROP_BRIGHTNESS,40);
+			//camera.set(Videoio.CV_CAP_PROP_CONTRAST,120);
+			//camera.set(Videoio.CV_CAP_PROP_SATURATION,80);
+			//camera.set(Videoio.CV_CAP_PROP_HUE,120);
+			//camera.set(Videoio.CV_CAP_PROP_GAIN,80);
+			//camera.set(Videoio.CV_CAP_PROP_EXPOSURE,120);
+		}	
 		try {
 			 mainThread = new Thread(new Runnable() {
 				@Override
@@ -79,17 +102,28 @@ public class CameraCore extends JPanel {
 						Mat temp=new Mat();
 						while(true){							
 							camera.read(mat);
-							Imgproc.cvtColor(mat, temp, Imgproc.COLOR_RGB2BGR);
-							Mat detectFace = detectFace(mat);						
-                            if(detectFace != null && flag == true){//检测到人脸,只拍一张暂停循环
-								mImg=CameraUtil.mat2BI(detectFace);
+							Imgproc.cvtColor(mat, temp, Imgproc.COLOR_RGB2BGR555);
+							Mat detectFace = detectFace(mat);
+							//System.out.println(mat+"-------"+detectFace+"======"+flag);
+							if(detectFace == null && flag == true ) {//未检测到人脸有身份证
+								mImg=mat2BI(mat);
+								repaint();
+							}else if(detectFace== null&&flag == false) {//未检测到人脸并且无身份证
+								mImg=mat2BI(mat);
+								repaint();
+							}else if(detectFace!= null&&flag == false) {//未检测到人脸并且无身份证
+								mImg=mat2BI(mat);
+								repaint();
+							}else if(detectFace != null && flag == true){//检测到人脸,只拍一张暂停循环
+								mImg=mat2BI(detectFace);
 								repaint();//panel.repaint(1000);重绘组件
 								flag = false ;
-							}else {
-								mImg=CameraUtil.mat2BI(CameraUtil.detectFace(mat));
-								//mImg=CameraUtil.mat2BI(mat);							
-								repaint();
-							}							
+							}
+							/*try {
+								Thread.sleep(100);
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+							}*/
 						}
 				}
 			});
@@ -104,6 +138,25 @@ public class CameraCore extends JPanel {
 		}
 
 	}
+	public BufferedImage mat2BI(Mat mat){  
+		int dataSize =mat.cols()*mat.rows()*(int)mat.elemSize();  
+		byte[] data=new byte[dataSize];  
+		mat.get(0, 0,data);  
+		int type=mat.channels()==1?	BufferedImage.TYPE_BYTE_GRAY:BufferedImage.TYPE_3BYTE_BGR;  
+		
+		if(type==BufferedImage.TYPE_3BYTE_BGR){  
+			for(int i=0;i<dataSize;i+=3){  
+				byte blue=data[i+0];  
+				data[i+0]=data[i+2];  
+				data[i+2]=blue;  
+			}  
+		}  
+		BufferedImage image=new BufferedImage(mat.cols(),mat.rows(),type);  
+		image.getRaster().setDataElements(0, 0, mat.cols(), mat.rows(), data);  
+		return image;  
+	}  
+	
+	
 	public void paintComponent(Graphics g){  
 		if(mImg!=null){  
 			g.drawImage(mImg, 0, 0, mImg.getWidth(),mImg.getHeight(),this);  
@@ -203,6 +256,62 @@ public class CameraCore extends JPanel {
 		}
 		return img;
 	}
+//	//语音播报
+//	public static void showSheng(String str) {
+//		ActiveXComponent sap = new ActiveXComponent("Sapi.SpVoice");
+//		// Dispatch是做什么的？
+//		Dispatch sapo = sap.getObject();
+//		try {
+//			
+//			// 音量 0-100
+//			sap.setProperty("Volume", new Variant(100));
+//			// 语音朗读速度 -10 到 +10
+//			sap.setProperty("Rate", new Variant(4));
+//			
+//			Variant defalutVoice = sap.getProperty("Voice");
+//			
+//			Dispatch dispdefaultVoice = defalutVoice.toDispatch();
+//			Variant allVoices = Dispatch.call(sapo, "GetVoices");
+//			Dispatch dispVoices = allVoices.toDispatch();
+//			
+//			Dispatch setvoice = Dispatch.call(dispVoices, "Item", new Variant(1)).toDispatch();
+//			ActiveXComponent voiceActivex = new ActiveXComponent(dispdefaultVoice);
+//			ActiveXComponent setvoiceActivex = new ActiveXComponent(setvoice);
+//			
+//			Variant item = Dispatch.call(setvoiceActivex, "GetDescription");
+//			// 执行朗读
+//			Dispatch.call(sapo, "Speak", new Variant(str));//"曾小明小朋友，早上好"
+//			
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		} finally {
+//			sapo.safeRelease();
+//			sap.safeRelease();
+//		}
+//	}
+
+
+	public VideoCapture getCamera() {
+		return camera;
+	}
+	public void setCamera(VideoCapture camera) {
+		this.camera = camera;
+	}
+	public static BufferedImage getmImg() {
+		return mImg;
+	}
+	public static void setmImg(BufferedImage mImg) {
+		CameraCapture.mImg = mImg;
+	}
+	public Thread getMainThread() {
+		return mainThread;
+	}
+	public void setMainThread(Thread mainThread) {
+		this.mainThread = mainThread;
+	}
+	public  String getShibieleixing() {
+		return shibieleixing;
+	}
 	public  void setShibieleixing(String shibieleixing) {
 		//showSheng(shibieleixing);
 		String oldshibieleixing = this.shibieleixing ;
@@ -252,9 +361,16 @@ public class CameraCore extends JPanel {
 		try {
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			Date date = new Date();
-	
+			
+			
 			String sfzpho = "D:\\faceimages\\faceimage\\"+upersonnum+"/"+upersonnum+"zp.bmp" ;
 			String filepath = "D:\\faceimages\\faceimage\\"+upersonnum+"/"+upersonnum+"" ;
+//			
+//			ImageLoader il = new ImageLoader();
+//	    	il.reader(sfzpho,filepath);//将位图改为jpg格式的图片
+//			
+//	    	sfzpho = "D:\\faceimages\\"+upersonnum+"/"+upersonnum+".jpg" ;
+			
 			AFRTest af = new AFRTest();
 			//System.out.println(filename+"----------"+sfzpho);
 	    	Float xsd = af.compareImage(filename, sfzpho);
@@ -357,6 +473,9 @@ public class CameraCore extends JPanel {
 		}
 		return str;
 	}
+	public Zkzdata getZkzdata() {
+		return zkzdata;
+	}
 	public void setZkzdata(Zkzdata zkzdata) {
 		Zkzdata oldzkzdata = this.zkzdata ;
 		this.zkzdata = zkzdata;
@@ -373,7 +492,5 @@ public class CameraCore extends JPanel {
 		firePropertyChange("types", oldtype, types);
 		this.types = false ;
 	}
-	public  void setImage() {
-		mImg=null;
-	}
+	
 }

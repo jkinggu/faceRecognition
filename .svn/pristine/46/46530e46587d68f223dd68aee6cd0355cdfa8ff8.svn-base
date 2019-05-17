@@ -87,7 +87,6 @@ public class CameraCore extends JPanel {
 								flag = false ;
 							}else {
 								mImg=CameraUtil.mat2BI(CameraUtil.detectFace(mat));
-								//mImg=CameraUtil.mat2BI(mat);							
 								repaint();
 							}							
 						}
@@ -373,7 +372,5 @@ public class CameraCore extends JPanel {
 		firePropertyChange("types", oldtype, types);
 		this.types = false ;
 	}
-	public  void setImage() {
-		mImg=null;
-	}
+	
 }

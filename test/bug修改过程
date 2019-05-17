@@ -7,4 +7,27 @@
  最终结论：
       当Mat元素为空时候，出现这种情况。
  解决方式：
-   不让Mat为空。创建一个识别方法
+      不让Mat为空。创建一个识别方法
+      在FaceMainFrame中加入 
+   public void removePanel() {
+		//清空getContentPane中的panel
+//		Thread.currentThread().getThreadGroup().list();
+		try {
+			if(panel != null) {
+				getContentPane().remove(panel);//清空里面的内容,重新添加
+				repaint();
+				if(facepanel != null && facepanel.getPanel1() != null && facepanel.getPanel1().getMainThread() != null) {
+					Thread mainThread = facepanel.getPanel1().getMainThread() ;
+					facepanel.getPanel1().getCamera().release();
+					facepanel.getPerson().closePerson();
+					facepanel.getPanel1().setMat(new Mat());
+					facepanel.getPanel1().setImage();
+					mainThread.interrupt();//摄像头线程中止
+				}
+			}
+		} catch (Exception e) {
+			System.out.println("摄像头或其线程中止报错");
+		} 
+注：核心摄像头驱动代码，稍有卡顿。
+
+
