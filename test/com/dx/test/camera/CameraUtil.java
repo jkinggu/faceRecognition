@@ -36,7 +36,7 @@ import com.dx.util.FileUtil;
  *
  * @version 1.0
  */
-public class CamperUtil {
+public class CameraUtil {
 	static {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 	}

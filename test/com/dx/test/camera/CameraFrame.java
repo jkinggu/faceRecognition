@@ -16,8 +16,8 @@ import javax.swing.JFrame;
 public class CameraFrame {
      public static void main(String[] args) {
         //ThreadProgram panel=new ThreadProgram(); 
-       CoreCamer panel1=new CoreCamer();
-       JFrame frame= CamperUtil.getJFrame(panel1);
+       CoreCamera panel1=new CoreCamera();
+       JFrame frame= CameraUtil.getJFrame(panel1);
        if(!frame.isShowing()) {
     	   System.out.println("+++++++++++++++++");
     	   panel1.getMainThread().interrupt();

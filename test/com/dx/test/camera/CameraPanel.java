@@ -30,14 +30,14 @@ import lombok.NoArgsConstructor;
  * @version 1.0
  */
 @NoArgsConstructor
-public class CamerPanel extends JPanel {
-	private CoreCamer panel1=null;
+public class CameraPanel extends JPanel {
+	private CoreCamera panel1=null;
 	public JPanel getCamerPanel() {
 		JPanel controlp = new JPanel();
 		BoxLayout layout=new BoxLayout(controlp,BoxLayout.X_AXIS);
 		
 	    controlp.setLayout(layout);
-		panel1 = new CoreCamer();
+		panel1 = new CoreCamera();
 		
     	//panel1.setBounds(0, 0, 700, 768);
 		// panel1.setSize(new Dimension(800, 800));

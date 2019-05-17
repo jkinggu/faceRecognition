@@ -3,23 +3,9 @@ package com.dx;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.Image;
-import java.awt.Insets;
-import java.awt.Toolkit;
-
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -30,16 +16,12 @@ import java.util.List;
 import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
-import javax.swing.text.TableView.TableRow;
-
-import org.freehep.graphicsio.swf.SetBackgroundColor;
 
 import com.dx.pojo.PersonCard;
 import com.dx.pojo.Zkzdata;
@@ -47,18 +29,21 @@ import com.jacob.activeX.ActiveXComponent;
 import com.jacob.com.Dispatch;
 import com.jacob.com.Variant;
 
+import lombok.Getter;
+import lombok.Setter;
+@Getter @Setter
 public class FacePhoPanel extends JPanel {
 	public FacePhoPanel() {
 	}
 	private String shibieleixing = "" ;
-	private CameraCapture panel1 = null ;
+	private CameraCore panel1 = null ;
 	private Person person = null ;
 	public JPanel getFacePhoPanel() {
 		JPanel controlp = new JPanel();
 		BoxLayout layout=new BoxLayout(controlp, BoxLayout.X_AXIS);
 		controlp.setLayout(layout);
 		
-		panel1 = new CameraCapture();
+		panel1 = new CameraCore();
 		controlp.add(panel1, "panel1");
 //		panel1.setBounds(0, 0, 700, 768);
 		panel1.setPreferredSize(new Dimension(700,768));
@@ -311,21 +296,6 @@ public class FacePhoPanel extends JPanel {
 		}
 	}
 	
-	public CameraCapture getPanel1() {
-		return panel1;
-	}
-
-	public void setPanel1(CameraCapture panel1) {
-		this.panel1 = panel1;
-	}
-
-	public Person getPerson() {
-		return person;
-	}
-
-	public void setPerson(Person person) {
-		this.person = person;
-	}
 	//”Ô“Ù≤•±®
 	public static void showSheng(String str) {
 		ActiveXComponent sap = new ActiveXComponent("Sapi.SpVoice");

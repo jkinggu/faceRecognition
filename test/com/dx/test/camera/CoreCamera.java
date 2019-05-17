@@ -23,7 +23,7 @@ import lombok.Setter;
  * @version 1.0
  */
 @Getter @Setter
-public class CoreCamer extends JPanel {
+public class CoreCamera extends JPanel {
 	static {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 	}
@@ -34,8 +34,8 @@ public class CoreCamer extends JPanel {
 	private VideoCapture camera = null;
 
 	
-	public CoreCamer() {	
-		camera=CamperUtil.getVideoCapture();		
+	public CoreCamera() {	
+		camera=CameraUtil.getVideoCapture();		
 		try {
 			  mainThread=new Thread(new Runnable() {			
 				@Override
@@ -44,7 +44,7 @@ public class CoreCamer extends JPanel {
 				       while(true) {
 				    	    camera.read(mat);
 							Imgproc.cvtColor(mat, temp,Imgproc.COLOR_RGB2BGR);
-							mImg=CamperUtil.mat2BI(CamperUtil.detectFace(mat));
+							mImg=CameraUtil.mat2BI(CameraUtil.detectFace(mat));
 							repaint();//p
 					   }
 				   				

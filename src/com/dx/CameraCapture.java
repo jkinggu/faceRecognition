@@ -100,7 +100,7 @@ CV_CAP_PROP_EXPOSURE 曝光(只对摄像头).
 				@Override
 				public void run() {
 						Mat temp=new Mat();
-						while(true){
+						while(true){							
 							camera.read(mat);
 							Imgproc.cvtColor(mat, temp, Imgproc.COLOR_RGB2BGR555);
 							Mat detectFace = detectFace(mat);
@@ -209,7 +209,7 @@ CV_CAP_PROP_EXPOSURE 曝光(只对摄像头).
 					String name = UUID.randomUUID().toString().replaceAll("-",""); 
 					//获取桌面路径
 					//File path = FileSystemView.getFileSystemView().getHomeDirectory();
-	//				File path = new File("D:\\faceimages");
+				   //File path = new File("D:\\faceimages");
 					String fpath = "D:\\faceimages/faceimage";
 					File path = new File(fpath);
 					FileUtil.createFile(fpath);

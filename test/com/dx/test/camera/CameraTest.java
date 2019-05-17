@@ -30,7 +30,7 @@ import org.opencv.videoio.Videoio;
  *
  * @version .0
  */
-public class CammerTest extends JPanel {
+public class CameraTest extends JPanel {
 	private  BufferedImage mImage;
 	private BufferedImage mat2BI(Mat mat) {
 		int dataSize=mat.cols()*mat.rows()*(int)mat.elemSize();
@@ -109,7 +109,7 @@ public class CammerTest extends JPanel {
 			}
 			JFrame frame = new JFrame("camera");
 			frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-			CammerTest panel = new CammerTest();
+			CameraTest panel = new CameraTest();
 		   // panel.setSize(0,0);
 			panel.addMouseListener(new MouseAdapter() {
 				@Override
@@ -161,12 +161,12 @@ public class CammerTest extends JPanel {
 			//frame.setSize(width+frame.getInsets().left+frame.getInsets().right,height+frame.getInsets().top+frame.getInsets().bottom);
             int n=0;
             Mat temp=new Mat();
+            
             while(frame.isShowing()&&n<500) {
             	capture.read(capImg);
             	Imgproc.cvtColor(capImg, temp,Imgproc.COLOR_RGB2BGR);
             	panel.mImage=panel.mat2BI(detectFace(capImg));
-            	panel.repaint();
-            	
+            	panel.repaint();      	
             }
             capture.release();
             frame.dispose();
