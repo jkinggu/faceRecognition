@@ -81,12 +81,13 @@ public class CameraCore extends JPanel {
 							camera.read(mat);
 							Imgproc.cvtColor(mat, temp, Imgproc.COLOR_RGB2BGR);
 							Mat detectFace = detectFace(mat);						
-                            if(detectFace != null && flag == true){//检测到人脸,只拍一张暂停循环                          	
+                            if(detectFace != null && flag == true){//检测到人脸,只拍一张暂停循环
 								mImg=CameraUtil.mat2BI(detectFace);
 								repaint();//panel.repaint(1000);重绘组件
 								flag = false ;
-							}else {							
-								mImg=CameraUtil.mat2BI(CameraUtil.detectFace(mat));														
+							}else {
+								mImg=CameraUtil.mat2BI(CameraUtil.detectFace(mat));
+								//mImg=CameraUtil.mat2BI(mat);							
 								repaint();
 							}							
 						}
@@ -191,6 +192,11 @@ public class CameraCore extends JPanel {
 						setShibieleixing("请保持不要乱晃~~~~");
 					}
 				}
+			}else {
+//				for (Rect rect : rects) {  //画框
+//					Imgproc.rectangle(img, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height),  
+//							new Scalar(0, 255, 245), 2);  
+//				} 
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
