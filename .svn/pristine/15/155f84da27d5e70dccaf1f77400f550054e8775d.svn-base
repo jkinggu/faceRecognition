@@ -1,9 +1,6 @@
 package com.dx;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -50,26 +47,22 @@ public class FaceMainFrame extends JFrame {
 		int x = (int)toolkit.getScreenSize().getWidth();
 		int y = (int)toolkit.getScreenSize().getHeight();
 		this.setLocation(x/2-700, y/2-384);
-		this.setSize(1600, 768);
-		this.setBounds(100,100,1700,768);	
+		this.setSize(1400, 768);
+		
+		//this.setResizable(false);
 		this.setVisible(true);
-		//setBackground(Color.MAGENTA);
+		setBackground(Color.MAGENTA);
 		setTitle("人脸采集系统");
 		ImageIcon icon=new ImageIcon("img/face.png");  
 		this.setIconImage(icon.getImage());
-		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		JMenuBar menubar = new JMenuBar();
-		menubar.setLayout(new FlowLayout(FlowLayout.LEADING,8,8));
-        setJMenuBar(menubar);
+		setJMenuBar(menubar);
 		JMenu menu1 = new JMenu("图像采集");
-		menu1.setFont(new Font("微软雅黑",Font.PLAIN,13));
 		menubar.add(menu1);
 		JMenuItem item1_1 = new JMenuItem("照片采集认证");
 		menu1.add(item1_1);
-		item1_1.setFont(new Font("微软雅黑",Font.PLAIN,13));
-		
 		
 		JMenu menu2 = new JMenu("采集认证查询统计");
 		menubar.add(menu2);
@@ -79,12 +72,6 @@ public class FaceMainFrame extends JFrame {
 		menu2.add(item2_2);
 		JMenuItem item2_3 = new JMenuItem("认证日志详情");
 		menu2.add(item2_3);
-		menu2.setFont(new Font("微软雅黑",Font.PLAIN,13));
-		item2_1.setFont(new Font("微软雅黑",Font.PLAIN,13));
-		item2_2.setFont(new Font("微软雅黑",Font.PLAIN,13));
-		item2_3.setFont(new Font("微软雅黑",Font.PLAIN,13));
-		
-		
 		
 		JMenu menu3 = new JMenu("数据管理");
 		menubar.add(menu3);
@@ -97,25 +84,13 @@ public class FaceMainFrame extends JFrame {
 		JMenuItem item3_4 = new JMenuItem("认证数据初始化");
 		menu3.add(item3_4);
 		
-		menu3.setFont(new Font("微软雅黑",Font.PLAIN,13));
-		item3_1.setFont(new Font("微软雅黑",Font.PLAIN,13));
-		item3_2.setFont(new Font("微软雅黑",Font.PLAIN,13));
-		item3_3.setFont(new Font("微软雅黑",Font.PLAIN,13));
-		item3_4.setFont(new Font("微软雅黑",Font.PLAIN,13));
-		
-		
-		
-		
-		
 		/**点击该按钮,达到打开controlp面板功能*/
 		item1_1.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent evt){
-				setLayout(new FlowLayout(FlowLayout.CENTER,10,10));
 				removePanel();
 				facepanel =  new FacePhoPanel() ;
-				panel = facepanel.getFacePhoPanel();				
+				panel = facepanel.getFacePhoPanel();
 				facepanel.getPerson();
-				
 				getContentPane().add(panel);
 				setVisible(true);
 			}
