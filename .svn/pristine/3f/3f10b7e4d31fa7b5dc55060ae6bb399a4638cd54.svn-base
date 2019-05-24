@@ -50,17 +50,16 @@ public class FacePhoPanel extends JPanel {
 	
          // controlp.setLayout(new BoxLayout(controlp, BoxLayout.X_AXIS));
         // controlp.setLayout(new FlowLayout(FlowLayout.LEADING,10, 10));
-		controlp.setLayout(new GridLayout(1, 2, 10, 10));
+		controlp.setLayout(new GridLayout(1, 2, 30, 15));
 		panel1 = new CameraCore();
 		//panel1.setSize(new Dimension(700,768));
 		controlp.add(panel1, "panel1");
 		//panel1.setBounds(0, 0, 700,600);
-	
 		panel1.setPreferredSize(new Dimension(800,600));
 		
 		JPanel panel2 = new JPanel();
-		panel2.setPreferredSize(new Dimension(200,600));
-		panel2.setLayout(new GridLayout(2, 1,0,10));
+		panel2.setPreferredSize(new Dimension(800,600));
+		panel2.setLayout(new GridLayout(2, 1, 10, 10));
 		controlp.add(panel2, "panel2");
 	 
 //		panel2.setBounds(700, 0, 700, 768);
@@ -80,13 +79,13 @@ public class FacePhoPanel extends JPanel {
 		//panel2you.setLayout(null);
 		
 		//如果没有放身份证提示放身份证
-//		if(!panel1.flag) {
-//			JLabel textLabel=new JLabel("请把身份证放在读卡机上！");
-//			textLabel.setFont(new Font("微软雅黑",Font.BOLD,16));
-//			textLabel.setForeground(Color.red);
-//			panel2zuo.add(textLabel);
-//		}
-//		
+		if(!panel1.flag) {
+			JLabel textLabel=new JLabel("请把身份证放在读卡机上！");
+			textLabel.setFont(new Font("微软雅黑",Font.BOLD,16));
+			textLabel.setForeground(Color.red);
+			panel2zuo.add(textLabel);
+		}
+		
 		
 		//添加身份证阅读监听器
 		JLabel label2 = new JLabel();//身份证照片

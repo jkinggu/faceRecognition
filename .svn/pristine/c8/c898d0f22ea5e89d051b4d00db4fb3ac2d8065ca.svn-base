@@ -1,6 +1,0 @@
-package com.dx.util;
-
-public class Const {
-    public static final Integer PAGESIZE=25;
-    public static final Integer FIRSTPAGE=1;
-}
