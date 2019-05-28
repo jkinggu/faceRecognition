@@ -24,6 +24,49 @@ public class FaceLogsImpl implements FaceLogsInterface {
 	private Connection conn = null;;
 	private ResultSet res = null;
 
+	
+    //查询所有考点
+	@Override
+	public List<String> getKd() {
+		String sql="SELECT DISTINCT(kaodianname) FROM paramsetup";
+		List<String> kaodian=DBTemplate.getResult(sql,new IResultHandler<List<String>>() {
+            
+			@Override
+			public List<String> handler(ResultSet rs) throws Exception {
+				List<String> kdList=new ArrayList<>();
+				kdList.add("请选择");
+			   while(rs.next()) {
+				   kdList.add(rs.getString("kaodianname"));
+				   
+			   }
+				return kdList;
+			}
+		});	
+		return kaodian;
+	}
+	//查询所有考场
+	@Override
+	public List<String> getKc() {
+		String sql="SELECT DISTINCT(kaochang) FROM paramsetup";
+		List<String> kaochang=DBTemplate.getResult(sql,new IResultHandler<List<String>>() {
+
+			@Override
+			public List<String> handler(ResultSet rs) throws Exception {
+				List<String> kcList=new ArrayList<>();
+				kcList.add("请选择");
+			   while(rs.next()) {
+				   kcList.add(rs.getString("kaochang"));
+				   
+			   }
+				return kcList;
+			}
+		});	
+		return kaochang;
+	}
+	
+	
+	
+	
 	@Override
 	public int insertFaceLogs(FaceLog faceLog) {
 		Connection conn = DBHelper.getConn();
@@ -129,7 +172,9 @@ public class FaceLogsImpl implements FaceLogsInterface {
 	}
 	
 	@Override
-	public PageResult getFaceLogsByPageCondition(String rzresult, String changci, String rzcount, String startime,
+	public PageResult getFaceLogsByPageCondition(String rzresult, String changci, 
+			String kaodian,String kaochang,
+			 String rzcount, String startime,
 			String endtime, Integer currentPage) {
 		//String tiaojian = "select zkzdata.xingming,zkzdata.upersonnum,zkzdata.zkznum,zkzdata.kd1,zkzdata.kc1,zkzdata.dd1 "
 		//		+ "from zkzdata left join facelog on zkzdata.upersonnum = facelog.sfz " + " where facelog.changci='"
@@ -192,10 +237,28 @@ public class FaceLogsImpl implements FaceLogsInterface {
 			}
 			
 		}
-		if(changci!=null&& !"".equals(changci)) {
-			baseSql+=" where facelog.changci='"+ changci + "' ";
-			countSql+=" where facelog.changci='"+ changci + "' ";
+		
+		if(kaodian!=null&&!"".equals(kaodian)) {
+			   baseSql+= " and zkzdata.kd1 LIKE '%"+kaodian+"%' ";
+			   countSql+=" and zkzdata.kd1 LIKE '%"+kaodian+"%' ";
+			   
+			
 		}
+		
+		if(kaochang!=null&&!"".equals(kaochang)) {
+			  baseSql+= " and zkzdata.kc1 LIKE '%"+kaochang+"%' ";
+			  countSql+=" and zkzdata.kc1 LIKE '%"+kaochang+"%' ";
+						
+		}
+		
+		
+		
+		if(changci!=null&& !"".equals(changci)) {
+			baseSql+=" where facelog.changci LIKE '%"+ changci + "%' ";
+			countSql+=" where facelog.changci LIKE  '%"+ changci + "%' ";
+		}
+		
+		
 		if(currentPage>0) {
 			baseSql+="LIMIT ? , ? ";
 		}

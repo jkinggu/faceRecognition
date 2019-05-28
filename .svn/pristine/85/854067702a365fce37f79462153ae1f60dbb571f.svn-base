@@ -1,0 +1,26 @@
+package com.dx.test.db;
+
+import org.junit.Test;
+
+import com.dx.util.DruidUtil;
+import com.mysql.jdbc.Connection;
+
+/**
+ * @author Administrator
+ *
+ * @Date 2019年5月27日
+ *
+ * 项目名 FaceRecongnition
+ *
+ *@version 1.0
+ */
+
+
+public class DataBaseTest {
+     @Test
+     public  void testDataSource() {
+    	 java.sql.Connection source=DruidUtil.getConnection();
+    	 System.out.println(source);
+    	 
+     }
+}

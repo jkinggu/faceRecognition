@@ -54,7 +54,7 @@ public class FaceMainFrame extends JFrame {
 		
 		//this.setBounds(100,100,1024,768);	
 		this.setSize(1024, 768);
-		this.setPreferredSize(new Dimension(1024, 768));
+		this.setPreferredSize(new Dimension(1024,768));
 		this.setVisible(true);
 		this.setLocationRelativeTo(null);
 		setBackground(Color.MAGENTA);
@@ -67,15 +67,16 @@ public class FaceMainFrame extends JFrame {
 		
 		
 		//打开默认进入摄像头界面
-		setLayout(new FlowLayout(FlowLayout.CENTER,10,42));		
+		setLayout(new FlowLayout(FlowLayout.CENTER,5,42));		
 		removePanel();
 		facepanel =  new FacePhoPanel();
-		panel = facepanel.getFacePhoPanel();				
+		panel = facepanel.getFacePhoPanel();	
+		panel.setSize(1024,768);
 		facepanel.getPerson();
 		getContentPane().add(panel);
 		setVisible(true);
 		
-		
+		//System.out.println(panel.getWidth()+"  "+panel.getHeight());
 		
 		
 		
@@ -129,7 +130,7 @@ public class FaceMainFrame extends JFrame {
 		/**点击该按钮,达到打开controlp面板功能*/
 		item1_1.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent evt){	
-				setLayout(new FlowLayout(FlowLayout.CENTER,10,20));
+				setLayout(new FlowLayout(FlowLayout.CENTER,10,42));
 				removePanel();			
 				facepanel =  new FacePhoPanel();
 				panel = facepanel.getFacePhoPanel();				
@@ -142,15 +143,17 @@ public class FaceMainFrame extends JFrame {
 	
 		item2_1.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent evt){
-				setLayout(new BorderLayout(10,10));
+				setLayout(new BorderLayout());
 				removePanel();				
-			    panel2 = new FaceLogsResultByPage();				 
+			    panel2 = new FaceLogsResultByPage();			  
 				getContentPane().add(panel2);
 				setVisible(true);
 			}
 		});
+		
 		item2_2.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent evt){
+				setLayout(new BorderLayout());				
 				removePanel();
 				//panel2 = new ResultTongji();
 				panel2=new StatisticsResultByPage();
@@ -159,7 +162,8 @@ public class FaceMainFrame extends JFrame {
 			}
 		});
 		item2_3.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent evt){
+			public void actionPerformed(ActionEvent evt){				
+				setLayout(new BorderLayout());	
 				removePanel();
 				panel2 = new LogDetailsPanel();
 				getContentPane().add(panel2);
@@ -190,6 +194,7 @@ public class FaceMainFrame extends JFrame {
 		item3_3.addActionListener(new ActionListener(){
 			
 			public void actionPerformed(ActionEvent evt){
+				setLayout(new BorderLayout());					
 				removePanel();
 				panel2 = new DataSetUp();
 				getContentPane().add(panel2);

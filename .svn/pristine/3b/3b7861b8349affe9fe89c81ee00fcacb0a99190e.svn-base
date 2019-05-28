@@ -1,0 +1,67 @@
+package com.dx.test.print;
+
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.print.PageFormat;
+import java.awt.print.Printable;
+import java.awt.print.PrinterException;
+
+import javax.swing.JButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+
+/**
+ * @author Administrator
+ *
+ * @Date 2019年5月27日
+ *
+ * 项目名 FaceRecongnition
+ *
+ *@version 1.0
+ */
+public class PrintPanel implements Printable{
+	private Object[][] data = { { "100", "0.8", "0.1", "90" } };
+	// Jtable表头
+	private Object[] head = { "单价", "折扣", "税", "调整后价格" };
+	// 存放数据的JTable
+	JTable table = new JTable(data, head);
+	private JScrollPane scrollPane = new JScrollPane(table);
+	// 打印按钮
+	private JButton printBtn = new JButton("打印");
+
+	
+	
+	
+	@Override
+	public int print(Graphics grp, PageFormat pf, int pageIndex) throws PrinterException {
+	  
+		Graphics2D g2d=(Graphics2D)grp;
+		g2d.setColor(Color.black);
+		//打印起点坐标
+		double x=pf.getImageableX();
+		double y=pf.getImageableY();
+		switch (pageIndex) {
+		case 0:
+			
+			break;
+
+		default:
+			break;
+		}
+		
+		
+		
+		
+		
+		return 0;
+	}
+	
+	
+	public static void main(String[] args) {
+		
+		
+		
+	}
+
+}
