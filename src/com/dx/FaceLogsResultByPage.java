@@ -6,7 +6,6 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -35,7 +34,7 @@ import com.dx.service.FaceLogsImpl;
 import com.dx.util.BaseUtil;
 import com.dx.util.Const;
 import com.dx.util.DateChooser;
-import com.fr.bi.cube.engine.third.edu.emory.mathcs.backport.java.util.Collections;
+import com.dx.util.PrinterTableUtil;
 
 /**
  * @author fang
@@ -68,6 +67,7 @@ public class FaceLogsResultByPage extends JPanel {
 	private JPanel pagePanel;// 把分页信息放在找个界面
 	// private TbUserlist user;
 	private JButton button = new JButton();
+	private JButton prtBtn=new JButton();
 	private DefaultTableModel dftm;
 	private BaseUtil bu = new BaseUtil();
 	private Integer allcount = 0;
@@ -294,6 +294,23 @@ public class FaceLogsResultByPage extends JPanel {
 					}
 				}
 			});
+			
+			
+			//打印按钮		
+			prtBtn=new JButton();
+			prtBtn.setFont(new Font(Const.FONT_TYPE, Font.PLAIN, Const.FONT_SIZE));
+			prtBtn.setText("打印");
+			barPanel.add(prtBtn);			
+			prtBtn.addActionListener(new ActionListener() {				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					 new PrinterTableUtil().printTable(dftm);   	
+					
+				}
+			});
+			
+			
+			
 			final JScrollPane scrollPane = new JScrollPane();
 			final GridBagConstraints gridBagConstraints_8 = new GridBagConstraints();
 			gridBagConstraints_8.weighty = 1.0;

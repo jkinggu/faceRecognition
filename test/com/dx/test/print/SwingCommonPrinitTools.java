@@ -196,7 +196,7 @@ public class SwingCommonPrinitTools implements Printable{
             g.drawString("负责人:", btmX, btmY);   
             g.drawString("制表:", pageWidth / 3, btmY);   
             FontMetrics fm = g.getFontMetrics();   
-            int dataWidth = fm.stringWidth("日期: 2009/10/26");   
+            int dataWidth = fm.stringWidth("日期: 2019/05/28");   
             g.drawString("日期:", pageWidth - dataWidth, btmY);   
         }   
     }   
