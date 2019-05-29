@@ -62,9 +62,9 @@ public class PrinterTableUtil implements Printable{
         double pageWidth = pf.getImageableWidth();   
         //纸张高   
         double pageHeight = pf.getImageableHeight();   
-        //打印的内容起始X   
+        //打印起始X   
         double pageStartX = pf.getImageableX();   
-        //打印的内容起始Y   
+        //打印起始Y   
         double pageStartY = pf.getImageableY();   
         //表头高   
         double tableHeadH = 0;   
@@ -73,16 +73,20 @@ public class PrinterTableUtil implements Printable{
     
         //计算表头高度和单元格高度   
         g.setFont(body_font);   
-        FontMetrics cellFm = g.getFontMetrics();   
+        FontMetrics cellFm = g.getFontMetrics();
         cellH = cellFm.getHeight() + cell_padding_y * 2 + 1;     
-        tableHeadH = cellH * 1.5;   
-    
+        tableHeadH = cellH * 1.5;     
         //表格以上的Margin   
        // double tableTopMargin = paper_offset_y + titleFm.getHeight() +    title_time_margin + timeFm.getHeight() + time_body_margin;   
         double tableTopMargin = paper_offset_y;   
         
         //表格每列的最大宽度   
         double[] cellColMaxWidths = caculateTableCellWidth(model, cellFm);   
+        double colWidth=0;
+        for(int j=0;j<cellColMaxWidths.length;j++) {
+        	colWidth+=cellColMaxWidths[j];     	
+        }
+        
     
         //当前Page的数据容量高度  
         //double currentPageDataCapacityHeight = pageHeight - tableTopMargin -  tableHeadH - btmFm.getHeight() - body_btm_margin - 1;   
@@ -91,7 +95,7 @@ public class PrinterTableUtil implements Printable{
         //当前Page的数据容量   
         int currentPageBodyCapacityRows = (int) (currentPageDataCapacityHeight / cellH);   
     
-        //Y方向的分页数量   
+        //Y方向计算总分页   
         int pagesY = 0;   
         if (model.getRowCount() % currentPageBodyCapacityRows == 0) {   
             pagesY = (int) (model.getRowCount()/currentPageBodyCapacityRows);   
@@ -99,17 +103,17 @@ public class PrinterTableUtil implements Printable{
             pagesY = (int) (model.getRowCount()/currentPageBodyCapacityRows) +1;   
         }   
     
-        //当前页数大于总页数时不打印   pageIndex从0开始
+        //当前页数大于总页数时不打印  pageIndex从0开始的
         if (pageIndex + 1 > pagesY) {   
             return NO_SUCH_PAGE;   
         }   
-    
-     
-    
+          
+         
         //绘制区域移动到新的(0,0)点   
-        g.translate((int) (paper_offset_x + pageStartX), (int) (tableTopMargin +   
-                pageStartY));   
-        int currentX = 0, currentY = 0;   
+       // g.translate((int) (paper_offset_x + pageStartX), (int) (tableTopMargin + pageStartY));
+        g.translate((int) ((pageWidth-colWidth-2*pageStartX)/2+pageStartX), (int) (tableTopMargin + pageStartY));      
+        int currentX = (int)pageStartX;     
+        int currentY = 0;   
         currentY += 5;   
         //绘制单一表头   
         for (int i = 0; i < model.getColumnCount(); i++) {   
@@ -118,24 +122,20 @@ public class PrinterTableUtil implements Printable{
             String name = model.getColumnName(i);   
             if(name.equals("序号")||name.equals("地点")) {
             	 continue;
-            }
-            
-            drawCell(g, name, currentX, currentY, (int) width,   
-                    (int) height, CENTER);   
+            }           
+            drawCell(g, name, currentX, currentY, (int) width,(int) height, CENTER);   
             currentX += width;   
         }   
-    
+        
         //绘制数据   
-        currentX = 0;   
+        currentX =(int)pageStartX;  
         currentY = (int) tableHeadH;   
+        currentY += 5;   
         //当前Page的数据容量   
         int rightCellX = 0;   
         int yIndex = pageIndex;   
         int startRow = currentPageBodyCapacityRows * yIndex;   
-        int endRow = (currentPageBodyCapacityRows * (yIndex + 1)) >
-                totalRow   
-                ? totalRow   
-                : (currentPageBodyCapacityRows * (yIndex + 1));   
+        int endRow = (currentPageBodyCapacityRows * (yIndex + 1)) >totalRow ? totalRow : (currentPageBodyCapacityRows * (yIndex + 1));   
         for (int row = startRow; row < endRow; row++) {   
             //绘制单项表头下面的数据   
             for (int i = 0; i < model.getColumnCount(); i++) {   
@@ -146,18 +146,17 @@ public class PrinterTableUtil implements Printable{
                	 continue;
                }
                 Object value = model.getValueAt(row, i);   
-                drawCell(g, value, currentX, currentY, (int) width,   
-                        (int) height, AUTO);   
+                drawCell(g, value, currentX, currentY, (int) width,(int) height, AUTO);   
                 currentX += width;   
                 rightCellX = currentX;   
-            }   
-            currentX = 0;   
+          }   
+            currentX = (int)pageStartX;   
             currentY += cellH;   
         }   
     
         //绘制闭合线，下面和右侧两条   
-        g.drawLine(currentX, currentY, rightCellX, currentY);   
-        g.drawLine(rightCellX, 5, rightCellX, currentY);   
+        g.drawLine(currentX, currentY, rightCellX+1, currentY);   
+        g.drawLine(rightCellX+1, 5, rightCellX+1, currentY);   
     
         return PAGE_EXISTS;   
     }   
@@ -214,12 +213,10 @@ public class PrinterTableUtil implements Printable{
     /**  
      * 绘制单元格及里面的文字  
      */  
-    private static void drawCell(Graphics g, Object value, int x, int y,   
-            int width,   
-            int height, int locate) {   
-    
-        g.drawLine(x, y, x + width - 1, y);   
-        g.drawLine(x, y, x, y + height - 1);   
+    private static void drawCell(Graphics g, Object value, int x, int y,int width,int height, int locate) {   
+    	
+        g.drawLine(x, y, x + width+1, y);   
+        g.drawLine(x, y, x, y + height+1);   
         FontMetrics fm = g.getFontMetrics();   
         if (value == null) {   
             value = "";   
@@ -227,16 +224,12 @@ public class PrinterTableUtil implements Printable{
         switch (locate) {   
             case 0:   
                 //居左   
-                g.drawString(value.toString(), (int) (x + cell_padding_x), y +   
-                        (height - fm.getHeight()) / 2 + fm.getAscent());   
+                g.drawString(value.toString(), (int) (x + cell_padding_x), y +  (height - fm.getHeight()) / 2 + fm.getAscent());   
             case 1:   
                 //居右   
                 g.drawString(value.toString(),   
-                        (int) (x +   
-                        (width - fm.stringWidth(value.toString()) + width -   
-                        fm.stringWidth(value.toString()) - cell_padding_x) /   
-                        2), y +   
-                        (height - fm.getHeight()) / 2 + fm.getAscent());   
+                   (int) (x +(width - fm.stringWidth(value.toString()) + width - fm.stringWidth(value.toString()) - cell_padding_x)/2),
+                   y +(height - fm.getHeight()) / 2 + fm.getAscent());  
             case 2:   
                 //居中   
                 g.drawString(value.toString(), x + (width - fm.stringWidth(   

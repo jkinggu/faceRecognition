@@ -53,8 +53,8 @@ public class FaceMainFrame extends JFrame {
 //		this.setLocation(x/2-700, y/2-384);
 		
 		//this.setBounds(100,100,1024,768);	
-		this.setSize(1024, 768);
-		this.setPreferredSize(new Dimension(1024,768));
+		this.setSize(1610, 768);
+		this.setPreferredSize(new Dimension(1610,768));
 		this.setVisible(true);
 		this.setLocationRelativeTo(null);
 		setBackground(Color.MAGENTA);

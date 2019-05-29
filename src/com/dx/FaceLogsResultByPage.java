@@ -92,7 +92,7 @@ public class FaceLogsResultByPage extends JPanel {
 			GridBagLayout gridBagLayout = new GridBagLayout();
 			gridBagLayout.columnWeights = new double[] { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3.0 };
 			setLayout(gridBagLayout);
-
+             
 			// 把条件放入此panel
 			barPanel = new JPanel();
 			barPanel.setLayout(new FlowLayout(FlowLayout.LEADING, 10, 10));
@@ -304,8 +304,7 @@ public class FaceLogsResultByPage extends JPanel {
 			prtBtn.addActionListener(new ActionListener() {				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					 new PrinterTableUtil().printTable(dftm);   	
-					
+					 new PrinterTableUtil().printTable(dftm);   					
 				}
 			});
 			
@@ -349,7 +348,7 @@ public class FaceLogsResultByPage extends JPanel {
 				Zkzdata zkzdata = list.get(i);
 				allcount = allcount + 1;
 				Object[] row = new Object[] { allcount + "", zkzdata.getXingming(), zkzdata.getUpersonnum(),
-						zkzdata.getZkznum(), zkzdata.getDd1(), zkzdata.getKd1(), zkzdata.getKc1() };// ,param.getPid()+""
+						zkzdata.getZkznum(), zkzdata.getDd1(), zkzdata.getKd1(), zkzdata.getKc1() };
 				dftm.addRow(row);
 			}
 
@@ -368,7 +367,7 @@ public class FaceLogsResultByPage extends JPanel {
 			table.setFont(new Font(Const.FONT_TYPE, Font.PLAIN, Const.FONT_SIZE));
 			table.setRowHeight(30);
 			table.getTableHeader().setPreferredSize(new Dimension(table.getTableHeader().getWidth(), 30));
-			table.getTableHeader().setFont(new Font("", Font.PLAIN, 14));
+			table.getTableHeader().setFont(new Font(Const.FONT_TYPE, Font.PLAIN,Const.FONT_SIZE));
 
 			TableColumn column0 = table.getColumn("序号");
 			column0.setPreferredWidth(10);

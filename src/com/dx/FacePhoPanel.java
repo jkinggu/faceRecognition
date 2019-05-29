@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.beans.PropertyChangeEvent;
@@ -56,9 +57,11 @@ public class FacePhoPanel extends JPanel {
 		panel1.setPreferredSize(new Dimension(800,600));
 		panel1.setSize(800,600);
 		JPanel panel2 = new JPanel();
-		panel2.setPreferredSize(new Dimension(200,600));
+		panel2.setPreferredSize(new Dimension(800,600));
 		panel2.setSize(200,600);
-		panel2.setLayout(new GridLayout(2,1,0,10));
+		
+		GridBagLayout pan2Lay=new GridBagLayout();
+		panel2.setLayout(pan2Lay);
 		controlp.add(panel2, "panel2");
  
 		
@@ -66,12 +69,20 @@ public class FacePhoPanel extends JPanel {
 		//panel2zuo.setBackground(new Color(34, 22, 65));
 		//BoxLayout layout2=new BoxLayout(panel2,BoxLayout.Y_AXIS);
 		//panel2.setLayout(new BoxLayout(panel2,BoxLayout.Y_AXIS));
-		panel2.add(panel2zuo, "panel2zuo");//这里放所有的照片
+		GridBagConstraints pan2zCon=new GridBagConstraints();
+		pan2zCon.gridy=0;
+		pan2zCon.gridx=0;
+		pan2zCon.weighty=1;  
+		panel2.add(panel2zuo,pan2zCon);//这里放所有的照片
 		//panel2zuo.setLayout(null);
 		JPanel panel2you = new JPanel();
-		panel2you.setBackground(new Color(67, 87, 66));
-		panel2.add(panel2you, "panel2you");//这里放准考证
-		//panel2you.setLayout(null);
+		GridBagConstraints pan2yCon=new GridBagConstraints();
+		pan2yCon.gridy=1;
+		pan2yCon.gridx=0;
+	    pan2yCon.weighty=2;
+		//panel2you.setBackground(new Color(200, 200, 66));		
+		panel2.add(panel2you,pan2yCon);//这里放准考证
+		
 		
 		//如果没有放身份证提示放身份证
 //		if(!panel1.flag) {
