@@ -199,7 +199,7 @@ public class ParamSetupImpl implements ParamSetupInterface{
 				sql = sql + " where ustatu = '"+ustatu+"' " ;
 			}
 		}	
-		System.out.println(sql+"   ===================");
+		
 		List<ParamSetup> list = new ArrayList<ParamSetup>();
 	    list=DBTemplate.getResult(sql, new IResultHandler<List<ParamSetup>>() {
 			@Override
@@ -219,12 +219,8 @@ public class ParamSetupImpl implements ParamSetupInterface{
 					parame.setAdminid(Integer.parseInt(rs.getString("adminid")));
 					parame.setDidian(rs.getString("didian")); 
 					parame.setUstatu(rs.getString("ustatu")); 
-					pList.add(parame);
-			
-				}
-				for(ParamSetup p:pList) {
-					System.out.println(p.toString());
-				}
+					pList.add(parame);		
+				}	
 		       return pList;
 			}
 		});

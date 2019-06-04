@@ -354,7 +354,8 @@ public class DataSetUp extends JPanel{
 				ParamSetup param = list.get(i) ;
 				allcount = allcount+1 ;
 				checkbox = new JCheckBox(param.getPid()+"");
-				hobby[i] = checkbox ;//获取checkbox序列
+				hobby[i] = checkbox ;
+				//获取checkbox序列
 				//dftm.addRow(new String[] {"",allcount+"",param.getDishiname(),param.getKaodianname(),param.getDidian(),param.getKaochang(),param.getStarttime(),param.getEndtime()});
 				Object[] row = new Object[] {"",allcount+"",param.getDishiname(),param.getKaodianname(),param.getDidian(),param.getKaochang(),param.getStarttime(),param.getEndtime()} ;//,param.getPid()+""
 				//Object[] row = new Object[] {param.getPid()+"",allcount+"",param.getDishiname(),param.getKaodianname(),param.getDidian(),param.getKaochang(),param.getStarttime(),param.getEndtime(),param.getPid()+""} ;

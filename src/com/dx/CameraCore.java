@@ -6,11 +6,15 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.imageio.ImageIO;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+
+import org.omg.CORBA.PRIVATE_MEMBER;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfRect;
@@ -21,7 +25,6 @@ import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
 import org.opencv.videoio.VideoCapture;
-import org.opencv.videoio.Videoio;
 
 import com.dx.inter.FaceLogsInterface;
 import com.dx.inter.FaceadminInteraface;
@@ -57,7 +60,10 @@ public class CameraCore extends JPanel {
 	private  File f = null ;
 	private String filepath  ; 
 	static String upersonnum = "" ;
-	private String shibieleixing = "" ;
+	private String shibieleixing = "" ;//识别类型
+	private Integer rzCount=0;//认证次数
+	//识别类型和认证次数综合
+	private Map<String, Object> rzMap=new HashMap<>();
 	private VideoCapture  camera = null;
 	private Zkzdata zkzdata = null ;
 	private FaceadminInteraface faceservice = new FaceadminImpl();
@@ -80,8 +86,8 @@ public class CameraCore extends JPanel {
 						while(true){							
 							camera.read(mat);
 							Imgproc.cvtColor(mat, temp, Imgproc.COLOR_RGB2BGR);
-							Mat detectFace = detectFace(mat);						
-                            if(detectFace != null && flag == true){//检测到人脸,只拍一张暂停循环                          	
+							Mat detectFace = detectFace(mat);
+							if(detectFace != null && flag == true){//检测到人脸,只拍一张暂停循环                          	
 								mImg=CameraUtil.mat2BI(detectFace);
 								repaint();//panel.repaint(1000);重绘组件
 								flag = false;
@@ -121,17 +127,25 @@ public class CameraCore extends JPanel {
 				setTypes(flag);
 				setShibieleixing("");
 				
+				//判断此人是否是当场考试
+				if(!"".equals(upersonnum)) {
+					
+					Boolean zkzFlag=impl.getIsExitORnot(upersonnum);
+					if(!zkzFlag) {
+						 Map<String, Object> exMap=new HashMap<>();
+						 exMap.put("type","非本场考生");
+						 exMap.put("rzCount",0);
+						 exMap.put("rzFlag",false);
+						 setRzMap(exMap);
+						 return img;
+					}
+				}
+				
+
 				MatOfRect faceDetections = new MatOfRect();
 				faceDetector.detectMultiScale(img, faceDetections);
 				Rect[] rects = faceDetections.toArray();
-				
-			
-			
-				//CascadeClassifier faceDetector = new CascadeClassifier("D:\\faceimages\\opencv\\sources\\data\\lbpcascades/lbpcascade_profileface.xml");
-				//这是opencv的安装路径下找到sources\\data\\haarcascades\\haarcascade_frontalface_alt.xml文件
-				//CascadeClassifier faceDetector = new CascadeClassifier("D:\\faceimages\\opencv\\sources\\data\\haarcascades_cuda/haarcascade_frontalface_alt.xml");
-				// 在图片中检测人脸
-				
+		
 				Mat image2 = null ;
 				if(rects != null && rects.length == 1 && flag == true){ 
 				//	System.out.println(rects.length+"----rects.length");
@@ -177,8 +191,14 @@ public class CameraCore extends JPanel {
 					//文件地址名称保存数据库
 					System.out.println("upersonnum---"+upersonnum);
 					if(!"".equals(upersonnum)) {
-						String sbleix = this.getStrByAllpho(upersonnum,filename);
-						setShibieleixing(sbleix);
+						Map<String,Object> rsMap=this.getTypeAndrzCount(upersonnum,filename);
+						setRzMap(rsMap);
+						
+					  // setShibieleixing((String)rsMap.get("type"));					   
+					   // setRzCount((Integer)rsMap.get("rzCount"));
+	
+						//String sbleix = this.getStrByAllpho(upersonnum,filename);
+						//setShibieleixing(sbleix);
 					}
 				}else if(rects != null && rects.length > 1 && flag == true){
 					System.out.println("有多个 人脸~~~~~~");
@@ -204,7 +224,18 @@ public class CameraCore extends JPanel {
 		firePropertyChange("shibieleixing", oldshibieleixing, shibieleixing);//监听该属性是否发生改变
 		
 	}
-
+     public void setRzCount(Integer rzCount) {
+    	Integer oldRzCount=this.rzCount;
+    	this.rzCount=rzCount; 
+    	firePropertyChange("rzCount", oldRzCount,rzCount);//监听该属性是否发生改变 
+    	 
+     }
+	public void setRzMap(Map<String, Object> map) {
+		Map<String, Object> oldRzMap=this.rzMap;
+    	this.rzMap=map; 
+    	firePropertyChange("rzMap", oldRzMap,map);//监听该属性是否发生改变 
+		
+	}
 	public String getFilepath() {
 		return filepath;
 	}
@@ -214,22 +245,9 @@ public class CameraCore extends JPanel {
 		firePropertyChange("filepath", oldpath, filepath);  //监听该属性是否发生改变
 	}
 
-	//图片切割
-	public BufferedImage SplitImage(BufferedImage img, int x, int y, 
-			int width, int height) {
-		if(x+width >= img.getWidth() || y+height >= img.getHeight()) {
-			return null;
-		}else {
-			BufferedImage newImg = new BufferedImage(width, height, 
-					BufferedImage.TYPE_INT_ARGB);
-			for(int i=x;i<x+width;i++) {
-				for(int j=y;j<y+height;j++) {
-					newImg.setRGB(i-x, j-y, img.getRGB(i, j));
-				}
-			}
-			return newImg;
-		}
-	}
+	
+	
+	
 	/**
 	 * //取准考证上的照片
 	 * 照片地址固定
@@ -238,11 +256,15 @@ public class CameraCore extends JPanel {
 	 * filename现场图片地址存数据库
 	 * zkzpho准考证照片
 	 * */
-	private String getStrByAllpho(String upersonnum, String filename) {
-		String str = "" ;
+	
+    private Map<String,Object> getTypeAndrzCount(String upersonnum, String filename) {
+    	Map<String,Object> map=new HashMap<>();
+    	String str = "" ;
 		String strint = "" ;
 		String xingming = "" ;
 		String xingbie = "" ;
+		Integer rzCount=null;
+		Boolean sucFlag=false;
 		try {
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			Date date = new Date();
@@ -255,56 +277,56 @@ public class CameraCore extends JPanel {
 	    	xingming=card.getPname() ;
 	    	xingbie = card.getPsex() ;
 			System.out.println("返回的相似度----"+xsd+"--------"+xingming+"--------"+xingbie);
-			if(xsd<50) {
-				str = "非本人身份证" ;
-				strint = "1" ;
-			}else {
-				//查询该身份证号的准考证的信息
-				ZkzInterface zkzimpl = new ZkzInterImpl();
-				Zkzdata zkz = zkzimpl.findByPersonnum(upersonnum);
-				if(zkz == null) {
-					str= "非考生" ;//非注册人员
+			
+			//查询该身份证号的准考证的信息
+			ZkzInterface zkzimpl = new ZkzInterImpl();
+			Zkzdata zkz = zkzimpl.findByPersonnum(upersonnum);
+			if(zkz == null) {
+					str= "非本场考生" ;//非注册人员
 					strint = "2" ;
 				}else {
-					xingming = zkz.getXingming() ;
-					xingbie = zkz.getXingbie() ;
-					String sj = zkz.getSj1().substring(0, 10);//年-月-日
-					String dd = zkz.getDd1() ;//地点
-					String kc = zkz.getKc1() ;//考场
-//					System.out.println(sj+"----"+dd+"----"+kc);
-					//判断是否为设置过的时间的考生
-					ParamSetupInterface paramimpl = new  ParamSetupImpl();
-					Integer paramc = paramimpl.getParamSetupBySj(sj);
-					if(paramc!=0) {//日期对
-						paramc = paramimpl.getParamSetupByDd(sj,dd);
-						if(paramc != 0) {
-							paramc = paramimpl.getParamSetupByKc(sj,dd,kc);
+					if(xsd<50) {
+						str = "非本人";
+						strint = "1" ;
+					}else {						
+						xingming = zkz.getXingming() ;
+						xingbie = zkz.getXingbie() ;
+						String sj = zkz.getSj1().substring(0, 10);//年-月-日 考试时间
+						String dd = zkz.getDd1() ;//地点
+						String kc = zkz.getKc1() ;//考场
+//						System.out.println(sj+"----"+dd+"----"+kc);
+						//判断是否为设置过的时间的考生
+						ParamSetupInterface paramimpl = new  ParamSetupImpl();
+						Integer paramc = paramimpl.getParamSetupBySj(sj);
+						if(paramc!=0) {//日期对
+							paramc = paramimpl.getParamSetupByDd(sj,dd);
 							if(paramc != 0) {
-								//这里需要显示准考证信息了
-								strint = "7" ;//通过
-								str = "通过";
-								//str = zkz.toString();//准考证信息显示
-								//zkzdata = zkz ;
-								setZkzdata(zkz);
+								paramc = paramimpl.getParamSetupByKc(sj,dd,kc);
+								if(paramc != 0) {
+									//这里需要显示准考证信息了
+									strint = "7" ;//通过
+									str = "通过";									
+									//str = zkz.toString();//准考证信息显示
+									//zkzdata = zkz ;
+									setZkzdata(zkz);
+								}else {
+									str= "考场不正确" ;
+									strint = "6" ;
+								}
 							}else {
-								str= "考场不正确" ;
-								strint = "6" ;
+								str= "考试地点不正确" ;
+								strint = "5" ;
 							}
 						}else {
-							str= "考试地点不正确" ;
-							strint = "5" ;
+							str= "考试时间不正确" ;
+							strint = "3" ;
 						}
-					}else {
-						str= "考试时间不正确" ;
-						strint = "3" ;
-					}
-					
+						
+					}			
 					
 				}
 				
 				
-			}
-			
 			
 			
 			FaceLog faceLog = new FaceLog();
@@ -327,23 +349,150 @@ public class CameraCore extends JPanel {
 			if(admin != null) {
 				faceLog.setDenglumana(admin.getBmname());
 				faceLog.setChangci(admin.getCurchangci());
-				//该人该场次的最后一条数据
-				FaceLog lastfaceLog = impl.getLastFaceLog(upersonnum,admin.getCurchangci());
-				if(lastfaceLog == null) {
-					faceLog.setRenzcount("1");
+				
+				//获取rzcount
+				
+				Map<String,Object> rzSucMap=impl.getLastSucessFaceLogRzcountAndFlag(upersonnum, admin.getCurchangci());
+			    
+				rzCount=(Integer)rzSucMap.get("rzCount");
+			    sucFlag=(Boolean)rzSucMap.get("rzFlag");			    
+				 faceLog.setRenzcount(rzCount+"");
+				 if(rzCount>=3||sucFlag) {
+					 setZkzdata(zkz);
+				 }				 
+			}
+			impl.insertFaceLogs(faceLog);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	    map.put("type",str);
+	    map.put("rzCount",rzCount);
+	    map.put("rzFlag",sucFlag);
+    	return map;
+    	
+    }
+	
+	
+	/**
+	 * //取准考证上的照片
+	 * 照片地址固定
+	 * (身份证照片：D:\\faceimages\\411534199563559387\\411534199563559387zp.bmp，现场人脸：D:\\faceimages/时间戳.png，准考证照片：D:\faceimages\zkzpho\411534199563559387.JPG)
+	 * sfzpho身份证照片
+	 * filename现场图片地址存数据库
+	 * zkzpho准考证照片
+	 * */
+	private String getStrByAllpho(String upersonnum, String filename) {
+		String str = "" ;
+		String strint = "" ;
+		String xingming = "" ;
+		String xingbie = "" ;
+		Integer rzCount;
+		try {
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			Date date = new Date();
+	
+			String sfzpho = "D:\\faceimages\\faceimage\\"+upersonnum+"/"+upersonnum+"zp.bmp" ;
+			String filepath = "D:\\faceimages\\faceimage\\"+upersonnum+"/"+upersonnum+"" ;
+			AFRTest af = new AFRTest();
+			//System.out.println(filename+"----------"+sfzpho);
+	    	Float xsd = af.compareImage(filename, sfzpho);
+	    	xingming=card.getPname() ;
+	    	xingbie = card.getPsex() ;
+			System.out.println("返回的相似度----"+xsd+"--------"+xingming+"--------"+xingbie);
+			
+			//查询该身份证号的准考证的信息
+			ZkzInterface zkzimpl = new ZkzInterImpl();
+			Zkzdata zkz = zkzimpl.findByPersonnum(upersonnum);
+			if(zkz == null) {
+					str= "非本场考生" ;//非注册人员
+					strint = "2" ;
 				}else {
-					String coun = lastfaceLog.getRenzcount() ;
-					String shibieint = lastfaceLog.getShibieleixingint() ;
-					//System.out.println("coun------"+coun+"-------"+shibieint);
-					if(coun!=null&&!"".equals(coun) ) {
-						if(shibieint.equals("7")) {
-							//通过，不再保存renzcount,只是单纯的添加一条正常结果不管结果如何
+					if(xsd<50) {
+						str = "非本人";
+						strint = "1" ;
+					}else {
+						
+						xingming = zkz.getXingming() ;
+						xingbie = zkz.getXingbie() ;
+						String sj = zkz.getSj1().substring(0, 10);//年-月-日 考试时间
+						String dd = zkz.getDd1() ;//地点
+						String kc = zkz.getKc1() ;//考场
+//						System.out.println(sj+"----"+dd+"----"+kc);
+						//判断是否为设置过的时间的考生
+						ParamSetupInterface paramimpl = new  ParamSetupImpl();
+						Integer paramc = paramimpl.getParamSetupBySj(sj);
+						if(paramc!=0) {//日期对
+							paramc = paramimpl.getParamSetupByDd(sj,dd);
+							if(paramc != 0) {
+								paramc = paramimpl.getParamSetupByKc(sj,dd,kc);
+								if(paramc != 0) {
+									//这里需要显示准考证信息了
+									strint = "7" ;//通过
+									str = "通过";
+									//str = zkz.toString();//准考证信息显示
+									//zkzdata = zkz ;
+									setZkzdata(zkz);
+								}else {
+									str= "考场不正确" ;
+									strint = "6" ;
+								}
+							}else {
+								str= "考试地点不正确" ;
+								strint = "5" ;
+							}
 						}else {
-							Integer cc = Integer.parseInt(coun)+1;
-							faceLog.setRenzcount(cc+"");
+							str= "考试时间不正确" ;
+							strint = "3" ;
 						}
-					}
+						
+					}			
+					
 				}
+				
+				
+			
+			
+			FaceLog faceLog = new FaceLog();
+			faceLog.setRenlianphoto(filename);
+			faceLog.setSfz(upersonnum);
+			faceLog.setRemarks(xsd+"");//相似度
+			faceLog.setSfzphoto(sfzpho);
+			faceLog.setShijian(sdf.format(date));
+			if(strint.equals("7")) {
+				faceLog.setShibieleixing("通过");
+			}else {
+				faceLog.setShibieleixing(str);
+			}
+			faceLog.setShibieleixingint(strint);
+			faceLog.setXingming(xingming);
+			faceLog.setXingbie(xingbie);
+			//获取用户登陆场次，来确定为第几场考试，方便查询使用
+			Faceadmin admin = faceservice.getFaceadmin();
+			//System.out.println("admin------"+admin);
+			if(admin != null) {
+				faceLog.setDenglumana(admin.getBmname());
+				faceLog.setChangci(admin.getCurchangci());
+				
+				//获取rzcount
+			     rzCount=impl.getLastSucessFaceLogRzcount(upersonnum,admin.getCurchangci());
+				 faceLog.setRenzcount(rzCount+"");
+				//该人该场次的最后一条数据  为了获取rzcount
+//				FaceLog lastfaceLog = impl.getLastFaceLog(upersonnum,admin.getCurchangci());
+//				if(lastfaceLog == null) {
+//					faceLog.setRenzcount("1");
+//				}else {
+//					String coun = lastfaceLog.getRenzcount() ;
+//					String shibieint = lastfaceLog.getShibieleixingint() ;
+//					System.out.println("coun------"+coun+"-------"+shibieint);
+//					if(coun!=null&&!"".equals(coun) ) {
+//						if(shibieint.equals("7")) {
+//							//通过，不再保存renzcount,只是单纯的添加一条正常结果不管结果如何
+//						}else {
+//							Integer cc = Integer.parseInt(coun)+1;
+//							faceLog.setRenzcount(cc+"");
+//						}
+//					}
+//				}
 			}
 			impl.insertFaceLogs(faceLog);
 		} catch (Exception e) {

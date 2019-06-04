@@ -15,10 +15,15 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -39,9 +44,11 @@ import lombok.Setter;
 public class FacePhoPanel extends JPanel {
 	public FacePhoPanel() {
 	}
-	private String shibieleixing = "" ;
+	private String shibieleixing = "" ;//识别返回信息
+	private Integer rzCount=0;//识别次数
 	private CameraCore panel1 = null ;
 	private Person person = null ;
+	private JDialog dialog=null;//提示消息框
 	public JPanel getFacePhoPanel() {
 		JPanel controlp = new JPanel();
 		controlp.setLayout(new GridLayout(1, 2, 5, 5));
@@ -50,7 +57,7 @@ public class FacePhoPanel extends JPanel {
 		//panel1.setSize(new Dimension(700,768));
 		controlp.add(panel1, "panel1");
 		//panel1.setBounds(0, 0, 700,600);
-	
+	    
 		panel1.setPreferredSize(new Dimension(800,600));
 		panel1.setSize(800,600);
 		JPanel panel2 = new JPanel();
@@ -137,6 +144,8 @@ public class FacePhoPanel extends JPanel {
 		text.setForeground(Color.red);
 		panel2zuo.add(text);
 		
+		
+		
 		person = new Person();
 		person.addPropertyChangeListener(new PropertyChangeListener(){  
 			public void propertyChange(PropertyChangeEvent evt) {  
@@ -167,8 +176,7 @@ public class FacePhoPanel extends JPanel {
 					imageicon.setImage(imageicon.getImage().getScaledInstance(100,100,Image.SCALE_DEFAULT));//固定照片大小
 					label2.setIcon(imageicon);
 					//如果放置身份证发生改变，清空页面的文字提醒
-				//	text.setText("");
-					
+				//	text.setText("");					
 					
 				}
 				
@@ -192,18 +200,56 @@ public class FacePhoPanel extends JPanel {
 					for(int i=0; i<c1 ;i++) {
 						dftm.removeRow(0);
 					}
-				}else if(evt.getPropertyName().equals("shibieleixing")) {
-					shibieleixing = evt.getNewValue() +"";
+				}else if(evt.getPropertyName().equals("rzMap")) {
+					Map<String,Object> rzMap=(Map<String, Object>) evt.getNewValue();
+					shibieleixing = (String) rzMap.get("type");//认证返回信息
+					rzCount=(Integer)rzMap.get("rzCount");//是否成功过
+					Boolean rzFlag=(Boolean)rzMap.get("rzFlag");
 					//获取检验的结果并显示到页面上
-					text.setText(shibieleixing);//shibieleixing
-					//showSheng(shibieleixing);//语音播报结果
-					//将上一张准考证显示的内容清空
-					if(!"通过".equals(shibieleixing)) {
-						Integer c1 =dftm.getRowCount() ; 
-						for(int i=0; i<c1 ;i++) {
+					if("非本场考生".equals(shibieleixing)) {						
+						text.setText("shibieleixing");				   		    
+						
+					}else if((!("非本场考生".equals(shibieleixing))&&!"通过".equals(shibieleixing))&&rzCount<3&&(!rzFlag)){
+						text.setText(shibieleixing);//shibieleixing
+						//将上一张准考证显示的内容清空
+						for(int i=0;i<dftm.getRowCount();i++) {
 							dftm.removeRow(0);
 						}
+						
+					}else if("通过".equals(shibieleixing)){
+						text.setText("通过");//shibieleixing
+						
+					} else if(rzCount>=3&&(!rzFlag)) {				
+						    JOptionPane optionPane=new JOptionPane("请人工审核",JOptionPane.INFORMATION_MESSAGE);
+							JDialog dialog=optionPane.createDialog("提示信息");
+						    Timer timer=new Timer(true);					    
+						    timer.schedule(new TimerTask() {	
+								@Override
+								public void run() {
+									dialog.setVisible(false);
+									dialog.dispose();									
+								}
+							}, 30000);					    
+						    dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);  
+					        dialog.setAlwaysOnTop(true);  
+					        dialog.setModal(false);  
+					        dialog.setVisible(true);  				
+											
+					}else if(rzFlag){
+						text.setText("通过");//shibieleixing
 					}
+					
+					
+					//showSheng(shibieleixing);//语音播报结果
+					//将上一张准考证显示的内容清空
+//					if(!"通过".equals(shibieleixing)) {					 
+//						Integer c1 =dftm.getRowCount() ; 
+//						for(int i=0; i<c1 ;i++) {
+//							dftm.removeRow(0);
+//						}
+//					}
+					
+					
 				}else if(evt.getPropertyName().equals("zkzdata")) {
 					Integer c1 =dftm.getRowCount() ; 
 					for(int i=0; i<c1 ;i++) {
@@ -271,8 +317,7 @@ public class FacePhoPanel extends JPanel {
 						positioins.add(row7);
 						positioins.add(row8);
 						positioins.add(row9);
-					}
-					
+					}					
 //					for(int i=0; i<table.getRowCount(); i++){
 //						if (6 == i){
 //							table.setBackground(Color.YELLOW);

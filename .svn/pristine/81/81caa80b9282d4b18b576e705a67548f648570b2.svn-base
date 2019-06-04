@@ -65,6 +65,7 @@ public class FaceLogsResultByPage extends JPanel {
 
 	private JPanel barPanel;// 把条件查询放入这个界面
 	private JPanel pagePanel;// 把分页信息放在找个界面
+	private String tableTitle="";//表格标题名
 	// private TbUserlist user;
 	private JButton button = new JButton();
 	private JButton prtBtn=new JButton();
@@ -72,7 +73,7 @@ public class FaceLogsResultByPage extends JPanel {
 	private BaseUtil bu = new BaseUtil();
 	private Integer allcount = 0;
 	private FaceLogsInterface facelog = new FaceLogsImpl();
-
+    
 	// 分页|^
 	private JButton firstbutton = new JButton();
 	private JButton prebutton = new JButton();
@@ -239,7 +240,7 @@ public class FaceLogsResultByPage extends JPanel {
 			DateChooser dateChooser2 = DateChooser.getInstance("yyyy-MM-dd HH:mm:ss");
 			dateChooser2.register(endDate);
 			barPanel.add(endDate);
-
+             
 			// 查询按钮
 			button = new JButton();
 			// final GridBagConstraints gridBagConstraints_7 = new GridBagConstraints();
@@ -248,7 +249,7 @@ public class FaceLogsResultByPage extends JPanel {
 			button.setFont(new Font(Const.FONT_TYPE, Font.PLAIN, Const.FONT_SIZE));
 			button.setText("查询");
 			barPanel.add(button);
-
+            
 			button.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					// 认证结果
@@ -273,6 +274,7 @@ public class FaceLogsResultByPage extends JPanel {
 						JOptionPane.showMessageDialog(null, "请选择场次", "添加考场设置", JOptionPane.WARNING_MESSAGE);
 						return;
 					} else {
+						tableTitle=changci+rzresult+"统计名单信息";
 						pageResult = facelog.getFaceLogsByPageCondition(rzresult, changci,rzKaodian,rzKaochang, rzcount, startime, endtime,
 								currentPage);
 						// 重新更新jtable列表
@@ -304,7 +306,7 @@ public class FaceLogsResultByPage extends JPanel {
 			prtBtn.addActionListener(new ActionListener() {				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					 new PrinterTableUtil().printTable(dftm);   					
+					 new PrinterTableUtil().printTable(dftm,tableTitle);   					
 				}
 			});
 			
@@ -331,7 +333,7 @@ public class FaceLogsResultByPage extends JPanel {
 					}
 				}
 			};
-
+            //默认页面
 			// String[] tableHeads = new String[]{"选择","序号", "地市", "地点","考点", "考场",
 			// "开始时间","结束时间"};//,"id可以隐藏吗"
 			String[] tableHeads = new String[] { "序号", "姓名", "身份证号", "准考证号", "地点", "考点", "考场" };// ,"id可以隐藏吗"
@@ -340,8 +342,18 @@ public class FaceLogsResultByPage extends JPanel {
 			render.setHorizontalAlignment(SwingConstants.CENTER);// 设置单元格渲染方式
 
 			// 如何向table中放内容//查询初始数据
+			//添加表格标题
+			// 认证结果
+			String rzresult = bu.getStr(condition1.getSelectedItem() + "");
+			// 场次
+			String changci = bu.getStr(condition3.getSelectedItem() + "");
+			
+			if(!changci.equals("")) {			
+				tableTitle=changci+rzresult+"统计名单信息";
+				System.out.println(tableTitle);
+			}
 			pageResult = facelog.getFaceLogsByPageCondition(null, null,null,null,null, null, null, Const.FIRSTPAGE);
-
+            
 			allcount = 0;
 			List<Zkzdata> list = pageResult.getResult();
 			for (int i = 0; i < list.size(); i++) {
@@ -425,6 +437,7 @@ public class FaceLogsResultByPage extends JPanel {
 						JOptionPane.showMessageDialog(null, "请选择场次", "添加考场设置", JOptionPane.WARNING_MESSAGE);
 						return;
 					} else {
+						tableTitle=changci+rzresult+"统计名单信息";
 						pageResult = facelog.getFaceLogsByPageCondition(rzresult, changci,rzKaodian,rzKaochang, rzcount, startime, endtime,
 								Const.FIRSTPAGE);
 						// 重新更新jtable列表
@@ -479,7 +492,7 @@ public class FaceLogsResultByPage extends JPanel {
 						JOptionPane.showMessageDialog(null, "请选择场次", "添加考场设置", JOptionPane.WARNING_MESSAGE);
 						return;
 					} else {
-						
+						tableTitle=changci+rzresult+"统计名单信息";
 						pageResult = facelog.getFaceLogsByPageCondition(rzresult, changci,rzKaodian,rzKaochang, rzcount, startime, endtime,
 								pageResult.getPrevious());
 						
@@ -537,7 +550,7 @@ public class FaceLogsResultByPage extends JPanel {
 						JOptionPane.showMessageDialog(null, "请选择场次", "添加考场设置", JOptionPane.WARNING_MESSAGE);
 						return;
 					} else {
-						
+						tableTitle=changci+rzresult+"统计名单信息";
 						pageResult = facelog.getFaceLogsByPageCondition(rzresult, changci,rzKaodian,rzKaochang, rzcount, startime, endtime,
 								pageResult.getNext());
 											
@@ -594,7 +607,7 @@ public class FaceLogsResultByPage extends JPanel {
 						JOptionPane.showMessageDialog(null, "请选择场次", "添加考场设置", JOptionPane.WARNING_MESSAGE);
 						return;
 					} else {
-						
+						tableTitle=changci+rzresult+"统计名单信息";
 						pageResult = facelog.getFaceLogsByPageCondition(rzresult, changci,rzKaodian,rzKaochang, rzcount, startime, endtime,
 								pageResult.getTotalPage());
 						

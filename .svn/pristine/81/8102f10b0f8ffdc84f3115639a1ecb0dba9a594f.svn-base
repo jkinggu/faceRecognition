@@ -71,7 +71,7 @@ public class FaceMainFrame extends JFrame {
 		removePanel();
 		facepanel =  new FacePhoPanel();
 		panel = facepanel.getFacePhoPanel();	
-		panel.setSize(1024,768);
+		//panel.setSize(1024,768);
 		facepanel.getPerson();
 		getContentPane().add(panel);
 		setVisible(true);
@@ -235,7 +235,9 @@ public class FaceMainFrame extends JFrame {
 //		Thread.currentThread().getThreadGroup().list();
 		try {
 			if(panel != null) {
-				getContentPane().remove(panel);//清空里面的内容,重新添加	
+				
+				//getContentPane().remove(panel);//清空里面的内容,重新添加可能速度很慢
+				panel.updateUI();//建议用法				 
 				repaint();
 				if(facepanel != null && facepanel.getPanel1() != null && facepanel.getPanel1().getMainThread() != null) {
 					Thread mainThread = facepanel.getPanel1().getMainThread() ;					

@@ -26,7 +26,7 @@ public class PrinterTableUtil implements Printable{
 
 
 	private TableModel model = null;   
-   
+    private String title;
     private int totalRow = 0;   
     private static final int LEFT = 0;   
     private static final int RIGHT = 1;   
@@ -38,10 +38,11 @@ public class PrinterTableUtil implements Printable{
     private static final double cell_padding_y = 3;   
     private static final double cell_padding_x = 2;   
     private static final double body_cell_height = 20;    
-    private static final Font body_font = new Font("Dialog", Font.PLAIN, 10);   
+    private static final Font body_font = new Font("Dialog", Font.PLAIN, 12);   
+    private static final Font title_font = new Font("黑体", Font.PLAIN, 16);   
     
-    
-    public void printTable(TableModel model) {   
+    public void printTable(TableModel model,String title) {   
+    	this.title=title;
         this.model = model;        
         this.totalRow = model.getRowCount();   
         PrinterJob printJob = PrinterJob.getPrinterJob();   
@@ -60,41 +61,55 @@ public class PrinterTableUtil implements Printable{
     public int print(Graphics g, PageFormat pf, int pageIndex) throws  
             PrinterException {   
     	
-    	
+    
+    	Paper paper=new Paper();
+    	paper.setImageableArea(0, 0,595,842);
+        paper.setSize(595,842);
+    	pf.setPaper(paper);
         //纸张宽   
         double pageWidth = pf.getWidth();   
         //纸张高   
         double pageHeight = pf.getHeight();   
         //打印起始X   
-        double pageStartX = pf.getImageableX();   
+        //double pageStartX = pf.getImageableX();   
+        
         //打印起始Y   
-        double pageStartY = pf.getImageableY();   
+        double pageStartY = 45;   
         //表头高   
         double tableHeadH = 0;   
         //Cell高   
         double cellH = 0;   
-//        System.out.println(pf.getWidth()+ " ==== "+pf.getImageableWidth()+" ===  "+pf.getHeight()+" ===  "+pf.getImageableHeight()
-//        +"   "+pf.getImageableX()+"   "+pf.getImageableY()); 
+     // System.out.println(pf.getWidth()+ " ==== "+pf.getImageableWidth()+" ===  "+pf.getHeight()+" ===  "+pf.getImageableHeight()
+      // +"   "+pf.getImageableX()+"   "+pf.getImageableY()); 
         //计算表头高度和单元格高度   
         g.setFont(body_font);   
         FontMetrics cellFm = g.getFontMetrics();
         cellH = cellFm.getHeight() + cell_padding_y * 2 + 1;     
-        tableHeadH = cellH * 1.5;     
+        tableHeadH = cellH * 1.5;    
+        
+        //计算标题以及位置
+        String tableTitle=title;
+        g.setFont(title_font);
+        FontMetrics titleFm=g.getFontMetrics();
+        int titleWidth=titleFm.stringWidth(title);
+        int titleHeight=titleFm.getHeight();
+        
         //表格以上的Margin   
        // double tableTopMargin = paper_offset_y + titleFm.getHeight() +    title_time_margin + timeFm.getHeight() + time_body_margin;   
-        double tableTopMargin = paper_offset_y;   
+        double tableTopMargin = pageStartY;   
         
         //表格每列的最大宽度   
         double[] cellColMaxWidths = caculateTableCellWidth(model, cellFm);   
         double colWidth=0;
         for(int j=0;j<cellColMaxWidths.length;j++) {
-        	colWidth+=cellColMaxWidths[j];     	
+        	colWidth+=(cellColMaxWidths[j]);     	
         }
-       // System.out.println("======="+colWidth);
+        
+        //System.out.println("======="+colWidth+"==========="+cellColMaxWidths.length);
     
         //当前Page的数据容量高度  
         //double currentPageDataCapacityHeight = pageHeight - tableTopMargin -  tableHeadH - btmFm.getHeight() - body_btm_margin - 1;   
-        double currentPageDataCapacityHeight = pageHeight - tableTopMargin - 1;  
+        double currentPageDataCapacityHeight = pageHeight - tableTopMargin-titleHeight-paper_offset_y - 1;  
         
         //当前Page的数据容量   
         int currentPageBodyCapacityRows = (int) (currentPageDataCapacityHeight / cellH);   
@@ -106,19 +121,28 @@ public class PrinterTableUtil implements Printable{
         } else {   
             pagesY = (int) (model.getRowCount()/currentPageBodyCapacityRows) +1;   
         }   
-    
+        
         //当前页数大于总页数时不打印  pageIndex从0开始的
         if (pageIndex + 1 > pagesY) {   
             return NO_SUCH_PAGE;   
         }   
-          
          
+        
+        //绘制tableTitle
+        g.setFont(title_font);
+        g.drawString(tableTitle, (int)(pageWidth-titleWidth)/2,(int)(pageStartY+titleFm.getAscent()));
+        
+        
+        
         //绘制区域移动到新的(0,0)点   
-       // g.translate((int) (paper_offset_x + pageStartX), (int) (tableTopMargin + pageStartY));
-        g.translate((int) (pageWidth-colWidth)/2, (int) (tableTopMargin + pageStartY));      
-        int currentX = 0;     
+       // g.translate((int) (paper_offset_x + pageStartX), (int) (tableTopMargin + pageStartY));      
+        g.translate((int) (pageWidth-colWidth)/2, (int) ( tableTopMargin+titleHeight+paper_offset_y));      
+        
+      
+        int currentX =0;     
         int currentY = 0;   
-        currentY += 5;   
+        currentY += 5;          
+        g.setFont(body_font);
         //绘制单一表头   
         for (int i = 0; i < model.getColumnCount(); i++) {   
             double width = cellColMaxWidths[i];   
@@ -150,11 +174,11 @@ public class PrinterTableUtil implements Printable{
                	 continue;
                }
                 Object value = model.getValueAt(row, i);   
-                drawCell(g, value, currentX, currentY, (int) width,(int) height, AUTO);   
+                drawCell(g, value, currentX, currentY, (int) width,(int) height, CENTER);   
                 currentX += width;   
                 rightCellX = currentX;   
           }   
-            currentX = 0;   
+            currentX =0;   
             currentY += cellH;   
         }   
     
@@ -180,7 +204,12 @@ public class PrinterTableUtil implements Printable{
         
         for (int i = 0; i < model.getColumnCount(); i++) {   
             String name = model.getColumnName(i);   
-            headerColMaxWidths[i] = cellFm.stringWidth(name) + cell_padding_x*2 + 1;   
+            if(name.equals("序号")||name.equals("地点")) {
+              	 continue;
+              }
+            int j=0;
+            headerColMaxWidths[j] = cellFm.stringWidth(name) + cell_padding_x*3 + 1; 
+            j++;
         }   
         
         //没有数据时，表头每列的最大宽度就是表格每列的最大宽度   
@@ -188,8 +217,7 @@ public class PrinterTableUtil implements Printable{
     
         //算数据每列的数据最大宽度和表头每列最大宽度对比取出最大宽度
         for (int j = 0; j < model.getRowCount(); j++) {   
-            for (int i = 0; i < model.getColumnCount(); i++) {    
-            	
+            for (int i = 0; i < model.getColumnCount(); i++) {           	
                 //当列为序号和地点时候不做判断
             	String name=model.getColumnName(i);
             	if(name.equals("序号")||name.equals("地点")) {
@@ -205,7 +233,7 @@ public class PrinterTableUtil implements Printable{
                 if (value != null) {   
                     text = value.toString();   
                 }   
-                double temp = cellFm.stringWidth(text) + cell_padding_x * 2 + 1;   
+                double temp = cellFm.stringWidth(text) + cell_padding_x * 3 + 1;   
                 if (cellColMaxWidths[i] < temp) {   
                     cellColMaxWidths[i] = temp;   
                 }   
@@ -220,7 +248,7 @@ public class PrinterTableUtil implements Printable{
     private static void drawCell(Graphics g, Object value, int x, int y,int width,int height, int locate) {   
     	
         g.drawLine(x, y, x + width+1, y);   
-        g.drawLine(x, y, x, y + height+1);   
+        g.drawLine(x, y, x, y + height+4);   
         FontMetrics fm = g.getFontMetrics();   
         if (value == null) {   
             value = "";   
@@ -237,7 +265,7 @@ public class PrinterTableUtil implements Printable{
             case 2:   
                 //居中   
                 g.drawString(value.toString(), x + (width - fm.stringWidth(   
-                        value.toString())) / 2, y + (height -   
+                        value.toString())) / 2, y+ (height -   
                         fm.getHeight()) / 2 + fm.getAscent());   
             case 3:   
                 //自动判断   

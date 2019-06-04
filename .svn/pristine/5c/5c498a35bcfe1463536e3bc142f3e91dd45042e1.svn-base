@@ -159,7 +159,7 @@ public class DataSetUp extends JPanel{
 			condition3 = new JComboBox();
 			String[] kaochang = new String[] {}; //getKaoChang();//从数据库获取考场下拉列表
 			condition3.setModel(new DefaultComboBoxModel(kaochang));
-			condition3.setFont(new Font("", Font.PLAIN, 14));
+			condition3.setFont(new Font(Const.FONT_TYPE, Font.PLAIN, Const.FONT_SIZE));
 			condition3.setPreferredSize(new Dimension(200, 30));
 //			final GridBagConstraints gridBagConstraints_3 = new GridBagConstraints();
 //			gridBagConstraints_2.gridy = 0;
@@ -177,7 +177,7 @@ public class DataSetUp extends JPanel{
 			//时间框为填写区域
 			startDate = new JTextField();
 		//	final GridBagConstraints gridBagConstraints_4 = new GridBagConstraints();
-			startDate.setFont(new Font("", Font.PLAIN, 14));
+			startDate.setFont(new Font(Const.FONT_TYPE, Font.PLAIN, Const.FONT_SIZE));
 			startDate.setPreferredSize(new Dimension(200, 30));
 //			gridBagConstraints_4.gridy = 0;
 //			gridBagConstraints_4.gridx = 7;
@@ -186,7 +186,7 @@ public class DataSetUp extends JPanel{
 			barPanel.add(startDate);
 			
 			label5 = new JLabel();
-			label5.setFont(new Font("", Font.PLAIN, 14));
+			label5.setFont(new Font(Const.FONT_TYPE, Font.PLAIN, Const.FONT_SIZE));
 			label5.setText("至");
 			final GridBagConstraints gridBagConstraints5 = new GridBagConstraints();
 //			gridBagConstraints5.ipadx = 20;
@@ -196,7 +196,7 @@ public class DataSetUp extends JPanel{
 	
 			endDate = new JTextField();
 			//final GridBagConstraints gridBagConstraints_5 = new GridBagConstraints();
-			endDate.setFont(new Font("", Font.PLAIN, 14));
+			endDate.setFont(new Font(Const.FONT_TYPE, Font.PLAIN, Const.FONT_SIZE));
 			endDate.setPreferredSize(new Dimension(200, 30));
 			//gridBagConstraints_5.gridy = 0;
 			//gridBagConstraints_5.gridx = 9;
@@ -347,13 +347,15 @@ public class DataSetUp extends JPanel{
 			render.setFont(new Font(Const.FONT_TYPE, Font.PLAIN, Const.FONT_SIZE));
 			//如何向table中放内容//查询初始数据
 			List<ParamSetup> list = paramface.getShezhiList("","","","","","1",null);
+			
 			hobby = new JCheckBox[list.size()];
 			JCheckBox checkbox ;
 			for(int i=0 ;i<list.size() ;i++ ) {
 				ParamSetup param = list.get(i) ;
 				allcount = allcount+1 ;
 				checkbox = new JCheckBox(param.getPid()+"");
-				hobby[i] = checkbox ;//获取checkbox序列
+				hobby[i] = checkbox ;
+				//获取checkbox序列
 				//dftm.addRow(new String[] {"",allcount+"",param.getDishiname(),param.getKaodianname(),param.getDidian(),param.getKaochang(),param.getStarttime(),param.getEndtime()});
 				Object[] row = new Object[] {"",allcount+"",param.getDishiname(),param.getKaodianname(),param.getDidian(),param.getKaochang(),param.getStarttime(),param.getEndtime()} ;//,param.getPid()+""
 				//Object[] row = new Object[] {param.getPid()+"",allcount+"",param.getDishiname(),param.getKaodianname(),param.getDidian(),param.getKaochang(),param.getStarttime(),param.getEndtime(),param.getPid()+""} ;
@@ -366,7 +368,7 @@ public class DataSetUp extends JPanel{
 			table.setFont(new Font(Const.FONT_TYPE, Font.PLAIN, Const.FONT_SIZE));
 			table.setRowHeight(30);
 			table.getTableHeader().setPreferredSize(new Dimension(table.getTableHeader().getWidth(), 30));
-			table.getTableHeader().setFont(new Font("", Font.PLAIN, 14));
+			table.getTableHeader().setFont(new Font(Const.FONT_TYPE, Font.PLAIN, Const.FONT_SIZE));
 			//table.setEnabled(false);//table不可以操作
 			//下面的作用是为了可以选择多行，如果不需要选择多行，可注释掉，但在此处必须要，其它地方视情况而定
 			table.setSelectionModel(new DefaultListSelectionModel() {

@@ -3,12 +3,12 @@ package com.dx;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.Insets;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -17,18 +17,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
-import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
+import javax.swing.JTextArea;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
-
-import org.opencv.core.Mat;
 
 import com.dx.pojo.PersonCard;
 import com.dx.pojo.Zkzdata;
@@ -58,7 +55,7 @@ public class FacePhoPanel extends JPanel {
 		panel1.setSize(800,600);
 		JPanel panel2 = new JPanel();
 		panel2.setPreferredSize(new Dimension(800,600));
-		panel2.setSize(200,600);
+		panel2.setSize(800,600);
 		
 		GridBagLayout pan2Lay=new GridBagLayout();
 		panel2.setLayout(pan2Lay);
@@ -69,17 +66,20 @@ public class FacePhoPanel extends JPanel {
 		//panel2zuo.setBackground(new Color(34, 22, 65));
 		//BoxLayout layout2=new BoxLayout(panel2,BoxLayout.Y_AXIS);
 		//panel2.setLayout(new BoxLayout(panel2,BoxLayout.Y_AXIS));
+		
 		GridBagConstraints pan2zCon=new GridBagConstraints();
 		pan2zCon.gridy=0;
 		pan2zCon.gridx=0;
-		pan2zCon.weighty=1;  
+	
+		panel2zuo.setPreferredSize(new Dimension(800, 180));
 		panel2.add(panel2zuo,pan2zCon);//这里放所有的照片
 		//panel2zuo.setLayout(null);
 		JPanel panel2you = new JPanel();
 		GridBagConstraints pan2yCon=new GridBagConstraints();
 		pan2yCon.gridy=1;
 		pan2yCon.gridx=0;
-	    pan2yCon.weighty=2;
+		pan2yCon.insets=new Insets(0, 0, 10, 0);
+	    panel2you.setPreferredSize(new Dimension(800, 410));
 		//panel2you.setBackground(new Color(200, 200, 66));		
 		panel2.add(panel2you,pan2yCon);//这里放准考证
 		
@@ -106,13 +106,9 @@ public class FacePhoPanel extends JPanel {
 		panel2zuo.add(label3);
 		label3.setBounds(300, 0, 100,100);//固定lable的位置
 		
-		JPanel scrollPane = new JPanel();
-		GridBagConstraints gridBagConstraints_8 = new GridBagConstraints();
-		gridBagConstraints_8.weighty = 1.0;
-		gridBagConstraints_8.gridwidth = 1;
-		gridBagConstraints_8.gridy = 2;
-		gridBagConstraints_8.gridx = 1;
-		panel2you.add(scrollPane, gridBagConstraints_8);
+		//JScrollPane scrollPane=new JScrollPane();
+		//scrollPane.setPreferredSize(new Dimension(800, 400));
+		//panel2you.add(scrollPane);
 		
 		DefaultTableModel dftm = new DefaultTableModel(){
             @Override
@@ -171,8 +167,7 @@ public class FacePhoPanel extends JPanel {
 					imageicon.setImage(imageicon.getImage().getScaledInstance(100,100,Image.SCALE_DEFAULT));//固定照片大小
 					label2.setIcon(imageicon);
 					//如果放置身份证发生改变，清空页面的文字提醒
-				//	text.setText("");
-					
+				//	text.setText("");					
 					
 				}
 				
@@ -288,8 +283,11 @@ public class FacePhoPanel extends JPanel {
 				}
 		}}); 
 		
-		
-		scrollPane.add(table);
+		JTextArea ta=new JTextArea(20,50);
+		JScrollPane jPanel=new JScrollPane(table);
+		jPanel.add(ta);
+		jPanel.setPreferredSize(new Dimension(700, 410));
+		panel2you.add(jPanel);
 		
 		//提示语
 		text.setVisible(true);

@@ -8,7 +8,9 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.dx.dao.DBHelper;
 import com.dx.dao.DBTemplate;
@@ -111,7 +113,142 @@ public class FaceLogsImpl implements FaceLogsInterface {
 		FaceLogsInterface impl = new FaceLogsImpl();
 		System.out.println(impl.insertFaceLogs(faceLog));
 	}
+	//验证是否是当场考试
+	
+	@Override
+	public Boolean getIsExitORnot(String upersonnum) {
+		Boolean flag=false;
+		String sql="SELECT upersonnum FROM zkzdata WHERE upersonnum="+upersonnum;
+		flag=DBTemplate.getResult(sql, new IResultHandler<Boolean>() {
 
+			@Override
+			public Boolean handler(ResultSet rs) throws Exception {
+				Boolean f=false;
+				if(rs.next()) {
+					f=true;
+				}
+				
+				return f;
+			}
+		});
+		return flag;
+	}
+	
+	//获取验证次数和是否通过
+	@Override
+	public Map<String, Object> getLastSucessFaceLogRzcountAndFlag(String upersonnum, String curchangci) {
+		Map<String, Object> rsMap=new HashMap<>();
+		String sql="select * from facelog where sfz='" + upersonnum + "' and changci='" + curchangci
+				+ "' AND shibieleixingint='7'  ORDER BY id  LIMIT 1";		  
+		     FaceLog faceLogSuc=DBTemplate.getResult(sql, new IResultHandler<FaceLog>() {
+				@Override
+				public FaceLog handler(ResultSet rs) throws Exception {
+					FaceLog facelog=null;
+					if(rs.next()) {
+						facelog=new FaceLog();
+						facelog.setId(Integer.parseInt(rs.getString(1)));
+						facelog.setSfz(rs.getString(2));
+						facelog.setXingming(rs.getString(3));
+						facelog.setXingbie(rs.getString(4));
+						facelog.setShibieleixing(rs.getString(5));
+						facelog.setShibieleixingint(rs.getString(6));
+						facelog.setShijian(rs.getString(7));
+						facelog.setRenlianphoto(rs.getString(8));
+						facelog.setRemarks(rs.getString(9));
+						facelog.setSfzphoto(rs.getString(10));
+						facelog.setChangci(rs.getString(11));
+						facelog.setDenglumana(rs.getString(12));
+						facelog.setRenzcount(rs.getString(13));
+						
+					}
+					return facelog;
+				}
+			});
+		    if(faceLogSuc!=null) {	
+		    	if(faceLogSuc.getRenzcount()!=null) {
+		    		rsMap.put("rzCount",Integer.valueOf(faceLogSuc.getRenzcount()));
+		    		rsMap.put("rzFlag", true);
+		    		return rsMap;		    		
+		    	}
+		    	rsMap.put("rzCount",1);
+	    		rsMap.put("rzFlag", true);   	
+		    	return rsMap;
+		    }
+		   String sql2="select COUNT(*) from facelog where sfz='" + upersonnum + "' and changci='" + curchangci
+					+ "' AND shibieleixingint !='7' ";	  
+		   Integer rz=DBTemplate.getResult(sql2,new IResultHandler<Integer>() {
+			@Override
+			public Integer handler(ResultSet rs) throws Exception {
+				if(rs.next()) {				
+					return rs.getInt(1)+1;					
+				}
+				return 1;
+			}
+		});
+		   		
+		rsMap.put("rzCount",rz);
+    	rsMap.put("rzFlag", false);    		   
+		return rsMap;
+	}
+	
+	
+	
+	//获取某人认正条数
+	
+	@Override
+	public Integer getLastSucessFaceLogRzcount(String upersonnum, String curchangci) {
+		String sql="select * from facelog where sfz='" + upersonnum + "' and changci='" + curchangci
+				+ "' AND shibieleixingint='7'  ORDER BY id  LIMIT 1";
+		   System.out.println(sql);
+		     FaceLog faceLogSuc=DBTemplate.getResult(sql, new IResultHandler<FaceLog>() {
+				@Override
+				public FaceLog handler(ResultSet rs) throws Exception {
+					FaceLog facelog=null;
+					if(rs.next()) {
+						facelog=new FaceLog();
+						facelog.setId(Integer.parseInt(rs.getString(1)));
+						facelog.setSfz(rs.getString(2));
+						facelog.setXingming(rs.getString(3));
+						facelog.setXingbie(rs.getString(4));
+						facelog.setShibieleixing(rs.getString(5));
+						facelog.setShibieleixingint(rs.getString(6));
+						facelog.setShijian(rs.getString(7));
+						facelog.setRenlianphoto(rs.getString(8));
+						facelog.setRemarks(rs.getString(9));
+						facelog.setSfzphoto(rs.getString(10));
+						facelog.setChangci(rs.getString(11));
+						facelog.setDenglumana(rs.getString(12));
+						facelog.setRenzcount(rs.getString(13));
+						
+					}
+					return facelog;
+				}
+			});
+		    if(faceLogSuc!=null) {	
+		    	if(faceLogSuc.getRenzcount()!=null) {
+		    		return Integer.valueOf(faceLogSuc.getRenzcount());		    		
+		    	}
+		    	return 1;
+		    }
+		   String sql2="select COUNT(*) from facelog where sfz='" + upersonnum + "' and changci='" + curchangci
+					+ "' AND shibieleixingint !='7' ";
+		   System.out.println(sql2);
+		   Integer rz=DBTemplate.getResult(sql2,new IResultHandler<Integer>() {
+			@Override
+			public Integer handler(ResultSet rs) throws Exception {
+				if(rs.next()) {
+					System.out.println("==============");
+					return rs.getInt(1)+1;					
+				}
+				return 1;
+			}
+		});
+		   		
+		return rz;
+	}
+	 
+	
+    //获取某人再facelog最后一条记录
 	@Override
 	public FaceLog getLastFaceLog(String upersonnum, String curchangci) {
 		Connection conn = DBHelper.getConn();

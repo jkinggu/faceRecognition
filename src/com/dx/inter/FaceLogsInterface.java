@@ -1,6 +1,7 @@
 package com.dx.inter;
 
 import java.util.List;
+import java.util.Map;
 
 import com.dx.pojo.FaceLog;
 import com.dx.pojo.Zkzdata;
@@ -8,7 +9,13 @@ import com.dx.query.PageResult;
 
 public interface FaceLogsInterface {
 	public int insertFaceLogs(FaceLog faceLog);
-
+	
+	
+	//获取验证次数
+    public Integer getLastSucessFaceLogRzcount(String upersonnum, String curchangci);
+    //获取验证次数和是否通过
+    public Map<String, Object> getLastSucessFaceLogRzcountAndFlag(String upersonnum, String curchangci);
+    
 	public FaceLog getLastFaceLog(String upersonnum, String curchangci);
 	/**
 	 * 查询认证次数的集合
@@ -33,4 +40,11 @@ public interface FaceLogsInterface {
 	
 	public List<String> getKd();
 	public List<String> getKc();
+
+
+	/**
+	 * @param upersonnum
+	 * @return
+	 */
+	public Boolean getIsExitORnot(String upersonnum);
 }
