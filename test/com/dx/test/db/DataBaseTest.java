@@ -6,7 +6,6 @@ import org.junit.Test;
 
 import com.dx.inter.FaceLogsInterface;
 import com.dx.service.FaceLogsImpl;
-import com.dx.util.DruidUtil;
 
 /**
  * @author Administrator
@@ -24,8 +23,7 @@ public class DataBaseTest {
 	private FaceLogsInterface facelog = new FaceLogsImpl();
      @Test
      public  void testDataSource() {
-    	 java.sql.Connection source=DruidUtil.getConnection();
-    	 System.out.println(source);
+    
     	 
      }
      
